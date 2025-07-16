@@ -44,9 +44,9 @@ export function StudentSidebar() {
   };
 
   const getNavClass = ({ isActive }: { isActive: boolean }) =>
-    isActive 
-      ? "bg-orange-500/20 text-orange-400 border-r-2 border-orange-500" 
-      : "text-gray-300 hover:bg-white/10 hover:text-white";
+    isActive
+      ? "w-full bg-black text-orange-500 rounded-md px-2 py-1"
+      : "w-full text-gray-300 hover:bg-white/10 hover:text-white rounded-md px-2 py-1";
 
   return (
     <Sidebar className={`${state === "collapsed" ? "w-16" : "w-64"} bg-slate-900 border-r border-orange-500/20`}>
@@ -57,7 +57,7 @@ export function StudentSidebar() {
           </div>
           {state !== "collapsed" && (
             <div>
-              <h2 className="font-bold text-lg">Portal do Aluno</h2>
+              <h2 className="font-bold text-lg text-gray-400">Portal do Aluno</h2>
               <p className="text-gray-400 text-sm">Escola de Soldagem</p>
             </div>
           )}
@@ -72,18 +72,21 @@ export function StudentSidebar() {
           <SidebarGroupContent>
             <SidebarMenu className="space-y-2">
               {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url} 
-                      end 
-                      className={getNavClass}
-                    >
-                      <item.icon className="h-5 w-5 flex-shrink-0" />
-                      {state !== "collapsed" && <span className="ml-3">{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                <NavLink
+                  key={item.title}
+                  to={item.url}
+                  end
+                  className={({ isActive }) =>
+                    (isActive
+                      ? "flex items-center w-full bg-white text-orange-500 rounded-md px-2 py-1"
+                      : "flex items-center w-full"
+                        + " bg-[#22272b] text-orange-500 hover:bg-white/10 hover:text-white rounded-md px-2 py-1"
+                    ) + " focus:outline-none"
+                  }
+                >
+                  <item.icon className="h-5 w-5 flex-shrink-0" />
+                  {state !== "collapsed" && <span className="ml-3">{item.title}</span>}
+                </NavLink>
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
@@ -97,7 +100,7 @@ export function StudentSidebar() {
           </div>
           {state !== "collapsed" && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{userEmail}</p>
+              <p className="text-sm font-medium truncate text-gray-400">{userEmail}</p>
               <p className="text-gray-400 text-xs">Estudante</p>
             </div>
           )}
