@@ -60,9 +60,14 @@ const Login = () => {
       <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-orange-500/20 shadow-2xl">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
-            <div className="p-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-full welding-glow">
-              <Flame className="h-8 w-8 text-white" />
-            </div>
+              {/* <Flame className="h-8 w-8 text-white" /> */}
+              <div className="p-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-full welding-glow">
+                <img
+                  src="/logo.png"
+                  alt="Logo"
+                  className="h-12 w-12 object-contain"
+                />
+              </div>
           </div>
           <CardTitle className="text-2xl font-bold text-white">
             Área do Aluno

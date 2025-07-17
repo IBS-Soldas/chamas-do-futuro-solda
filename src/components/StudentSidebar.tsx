@@ -52,8 +52,15 @@ export function StudentSidebar() {
     <Sidebar className={`${state === "collapsed" ? "w-16" : "w-64"} bg-slate-900 border-r border-orange-500/20`}>
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg welding-glow">
+          {/* <div className="p-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg welding-glow">
             <Flame className="h-6 w-6 text-white" />
+          </div> */}
+          <div className="p-1 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg welding-glow">
+            <img
+              src="/logo.png"
+              alt="Logo"
+              className="h-10 w-10 object-contain"
+            />
           </div>
           {state !== "collapsed" && (
             <div>
