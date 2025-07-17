@@ -12,7 +12,7 @@ import { toast } from "@/hooks/use-toast";
 import { SignatureCanvas } from "@/components/SignatureCanvas";
 import { CheckCircle, User, Mail, Phone, MapPin, CreditCard, QrCode, Loader2 } from 'lucide-react';
 import { useCourses, Course } from '@/hooks/useCourses';
-import { brazilStates, getCitiesByState, City } from '@/data/brazil-states-cities';
+import { useBrazilStates, useBrazilCities, State as BrazilState, City as BrazilCity } from '@/hooks/useBrazilStatesCities';
 
 interface EnrollmentFormProps {
   isOpen: boolean;
@@ -24,9 +24,9 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
     name: '',
     email: '',
     phone: '',
+    address: '',
     state: '',
     city: '',
-    address: '',
     neighboorhood: '',
     number: '',
     selectedCourses: [] as string[],
@@ -40,8 +40,10 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
   // Fetch courses from Firebase
   const { data: courses = [], isLoading: coursesLoading, error: coursesError } = useCourses();
 
-  // Get available cities based on selected state
-  const availableCities = formData.state ? getCitiesByState(formData.state) : [];
+  // Fetch all states from IBGE
+  const { data: states = [], isLoading: statesLoading, error: statesError } = useBrazilStates();
+  // Fetch cities for selected state
+  const { data: cities = [], isLoading: citiesLoading, error: citiesError } = useBrazilCities(formData.state);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -221,81 +223,93 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                       className="mt-1"
                     />
                   </div>
-                </div>
 
-                {/* Estado e Cidade */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="state">Estado *</Label>
-                    <Select value={formData.state} onValueChange={handleStateChange}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Selecione um estado" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {brazilStates.map((state) => (
-                          <SelectItem key={state.id} value={state.id}>
-                            {state.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="state">Estado *</Label>
+                      <Select value={formData.state} onValueChange={handleStateChange} disabled={statesLoading || !!statesError} required>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder={statesLoading ? 'Carregando estados...' : statesError ? 'Erro ao carregar estados' : 'Selecione um estado'} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {states.map((state: BrazilState) => (
+                            <SelectItem key={state.sigla} value={state.sigla}>
+                              {state.nome}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="city">Cidade *</Label>
+                      <Select
+                        value={formData.city}
+                        onValueChange={handleCityChange}
+                        disabled={!formData.state || citiesLoading || !!citiesError}
+                        required
+                      >
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder={
+                            !formData.state
+                              ? 'Primeiro selecione um estado'
+                              : citiesLoading
+                                ? 'Carregando cidades...'
+                                : citiesError
+                                  ? 'Erro ao carregar cidades'
+                                  : 'Selecione uma cidade'
+                          } />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {cities.map((city: BrazilCity) => (
+                            <SelectItem key={city.id} value={city.nome}>
+                              {city.nome}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
+
                   <div>
-                    <Label htmlFor="city">Cidade *</Label>
-                    <Select
-                      value={formData.city}
-                      onValueChange={handleCityChange}
-                      disabled={!formData.state}
-                    >
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder={formData.state ? "Selecione uma cidade" : "Primeiro selecione um estado"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {availableCities.map((city) => (
-                          <SelectItem key={city.id} value={city.id}>
-                            {city.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Label htmlFor="address">Endereço</Label>
+                    <Input
+                      id="address"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                      placeholder="Seu endereço completo"
+                      className="mt-1"
+                      required
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="neighboorhood">Bairro</Label>
+                      <Input
+                        id="neighboorhood"
+                        name="neighboorhood"
+                        value={formData.neighboorhood}
+                        onChange={handleInputChange}
+                        placeholder="Seu bairro"
+                        className="mt-1"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="number">Número</Label>
+                      <Input
+                        id="number"
+                        name="number"
+                        value={formData.number}
+                        onChange={handleInputChange}
+                        placeholder="Seu número"
+                        className="mt-1"
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
-                <div>
-                  
-                </div>
-                {/* <div>
-                  <Label htmlFor="address">Endereço</Label>
-                  <Input
-                    id="address"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    placeholder="Seu endereço completo"
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="neighboorhood">Bairro</Label>
-                  <Input
-                    id="neighboorhood"
-                    name="neighboorhood"
-                    value={formData.neighboorhood}
-                    onChange={handleInputChange}
-                    placeholder="Seu bairro"
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="number">Número</Label>
-                  <Input
-                    id="number"
-                    name="number"
-                    value={formData.number}
-                    onChange={handleInputChange}
-                    placeholder="Seu número"
-                    className="mt-1"
-                  />
-                </div> */}
               </CardContent>
             </Card>
 
