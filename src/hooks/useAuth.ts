@@ -19,6 +19,7 @@ export const useAuth = () => {
         setError(null);
         try {
             const result = await signInWithEmailAndPassword(auth, email, password);
+            console.log(result)
             return result;
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred');

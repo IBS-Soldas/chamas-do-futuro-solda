@@ -8,26 +8,48 @@ import { Eye, EyeOff, Flame } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useFirebase } from '@/contexts/FirebaseContext';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast'; // If you have a toast hook
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [formError, setFormError] = useState('');
   const navigate = useNavigate();
 
   const { user, loading } = useFirebase();
   const { signIn, error } = useAuth();
+  const { toast } = useToast(); // If you use a toast system
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError('');
 
     if (loading) return;
 
     try {
       await signIn(email, password);
-      navigate('/dashboard');
-    } catch (err) {
-      console.error('Login failed:', err);
+      console.log('Login successful');
+      toast({
+        title: 'Login realizado com sucesso',
+        // description: 'Bem vindo a área do aluno',
+        variant: 'default',
+        duration: 2000,
+      });
+      navigate('/dashboard')
+      ;
+    } catch (err: any) {
+      // Show toast if available, otherwise set error state
+      console.log(err)
+      if (toast) {
+        toast({
+          title: 'Erro ao fazer login',
+          description:  'Não foi possível conectar. Verifique suas credenciais e conexão.',
+          variant: 'destructive',
+        });
+      } else {
+        setFormError( 'Não foi possível conectar. Verifique suas credenciais e conexão.');
+      }
     }
   };
 
@@ -92,6 +114,10 @@ const Login = () => {
                 </Button>
               </div>
             </div>
+
+            {formError && (
+              <div className="text-red-500 text-sm mt-2">{formError}</div>
+            )}
 
             <Button
               type="submit"

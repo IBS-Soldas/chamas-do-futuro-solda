@@ -5,6 +5,8 @@ import { Progress } from "@/components/ui/progress";
 import { BookOpen, FileText, Award, Clock, Users, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { Outlet } from 'react-router-dom';
+
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -39,6 +41,7 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
+      <Outlet />
       {/* Welcome Section */}
       <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 backdrop-blur-md border border-orange-500/20 rounded-lg p-6">
         <h1 className="text-3xl font-bold text-white mb-2">
