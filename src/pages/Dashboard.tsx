@@ -6,11 +6,16 @@ import { BookOpen, FileText, Award, Clock, Users, TrendingUp } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Outlet } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { useFirebase } from '@/contexts/FirebaseContext';
 
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const userEmail = localStorage.getItem('userEmail') || 'Aluno';
+  const { auth } = useFirebase()
+  const user = auth.currentUser
+  console.log(user)
 
   const stats = [
     {
@@ -95,7 +100,7 @@ const Dashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <Button 
+            <Button
               onClick={() => navigate('/dashboard/aulas')}
               className="w-full bg-blue-500 hover:bg-blue-600"
             >
@@ -119,7 +124,7 @@ const Dashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <Button 
+            <Button
               onClick={() => navigate('/dashboard/apostilas')}
               className="w-full bg-green-500 hover:bg-green-600"
             >
@@ -143,7 +148,7 @@ const Dashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <Button 
+            <Button
               onClick={() => navigate('/dashboard/certificados')}
               className="w-full bg-yellow-500 hover:bg-yellow-600 text-black"
             >
