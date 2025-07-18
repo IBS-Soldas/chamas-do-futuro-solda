@@ -10,6 +10,7 @@ import {
   User,
   Home
 } from 'lucide-react';
+import { useFirebase } from '@/contexts/FirebaseContext';
 import {
   Sidebar,
   SidebarContent,
@@ -35,11 +36,34 @@ const menuItems = [
 export function StudentSidebar() {
   const { state } = useSidebar();
   const navigate = useNavigate();
-  const userEmail = localStorage.getItem('userEmail') || 'Aluno';
+  const { auth } = useFirebase();
+  const user = auth.currentUser;
+  
+ 
+  const getUserName = () => {
+    if (user?.displayName) {
+      return user.displayName;
+    }
+    
+    const storedName = localStorage.getItem('userName');
+    if (storedName) {
+      return storedName;
+    }
+    
+    const userEmail = localStorage.getItem('userEmail');
+    if (userEmail) {
+      return userEmail.split('@')[0];
+    }
+    
+    return 'Aluno';
+  };
+  
+  const userName = getUserName();
 
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('userEmail');
+    localStorage.removeItem('userName');
     navigate('/');
   };
 
@@ -107,7 +131,7 @@ export function StudentSidebar() {
           </div>
           {state !== "collapsed" && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate text-gray-200">{userEmail}</p>
+              <p className="text-sm font-medium truncate text-gray-200">{userName}</p>
               <p className="text-gray-200 text-xs">Estudante</p>
             </div>
           )}
