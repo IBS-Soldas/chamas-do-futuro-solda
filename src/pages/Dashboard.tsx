@@ -12,10 +12,30 @@ import { useFirebase } from '@/contexts/FirebaseContext';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const userEmail = localStorage.getItem('userEmail') || 'Aluno';
-  const { auth } = useFirebase()
-  const user = auth.currentUser
-  console.log(user)
+  const { auth } = useFirebase();
+  const user = auth.currentUser;
+  
+ 
+  const getUserName = () => {
+    if (user?.displayName) {
+      return user.displayName;
+    }
+    
+    const storedName = localStorage.getItem('userName');
+    if (storedName) {
+      return storedName;
+    }
+    
+    const userEmail = localStorage.getItem('userEmail');
+    if (userEmail) {
+      return userEmail.split('@')[0];
+    }
+    
+    return 'Aluno';
+  };
+  
+  const userName = getUserName();
+  console.log('User data:', user);
 
   const stats = [
     {
@@ -50,7 +70,7 @@ const Dashboard = () => {
       {/* Welcome Section */}
       <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 backdrop-blur-md border border-orange-500/20 rounded-lg p-6">
         <h1 className="text-3xl font-bold text-white mb-2">
-          Bem-vindo de volta, {userEmail.split('@')[0]}!
+          Bem-vindo de volta, {userName}!
         </h1>
         <p className="text-gray-300">
           Continue seus estudos e torne-se um soldador profissional.
