@@ -6,11 +6,13 @@ import { Trash2, PenTool } from 'lucide-react';
 interface SignatureCanvasProps {
   onSignatureChange: (signature: string) => void;
   signature: string;
+  onRef?: (ref: { getSignatureAsBase64: () => string | null }) => void;
 }
 
 export const SignatureCanvas: React.FC<SignatureCanvasProps> = ({ 
   onSignatureChange, 
-  signature 
+  signature,
+  onRef
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -48,6 +50,13 @@ export const SignatureCanvas: React.FC<SignatureCanvasProps> = ({
     }
   }, [signature]);
 
+  // Expose the getSignatureAsBase64 function to parent component
+  useEffect(() => {
+    if (onRef) {
+      onRef({ getSignatureAsBase64 });
+    }
+  }, [onRef]);
+
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     if (!context) return;
     
@@ -76,7 +85,7 @@ export const SignatureCanvas: React.FC<SignatureCanvasProps> = ({
 
     let x, y;
     if ('touches' in e) {
-      e.preventDefault();
+      // Don't call preventDefault on passive events
       x = e.touches[0].clientX - rect.left;
       y = e.touches[0].clientY - rect.top;
     } else {
@@ -97,10 +106,19 @@ export const SignatureCanvas: React.FC<SignatureCanvasProps> = ({
       // Salvar a assinatura como base64
       const canvas = canvasRef.current;
       if (canvas) {
-        const signatureData = canvas.toDataURL();
+        const signatureData = canvas.toDataURL('image/png', 0.8);
+        console.log('Signature base64:', signatureData.substring(0, 50) + '...');
         onSignatureChange(signatureData);
       }
     }
+  };
+
+  const getSignatureAsBase64 = () => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      return canvas.toDataURL('image/png', 0.8);
+    }
+    return null;
   };
 
   const clearSignature = () => {
@@ -124,7 +142,8 @@ export const SignatureCanvas: React.FC<SignatureCanvasProps> = ({
         <div className="relative">
           <canvas
             ref={canvasRef}
-            className="w-full h-48 border border-gray-300 rounded bg-white cursor-crosshair touch-none"
+            className="w-full h-48 border border-gray-300 rounded bg-white cursor-crosshair"
+            style={{ touchAction: 'none' }}
             onMouseDown={startDrawing}
             onMouseMove={draw}
             onMouseUp={stopDrawing}

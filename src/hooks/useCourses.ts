@@ -3,7 +3,7 @@ import { firestore, queryHelpers } from '@/lib/firestore';
 
 export interface Course {
     id: string;
-    title: string;
+    name: string;
     price: number;
     duration: string;
     description: string;
