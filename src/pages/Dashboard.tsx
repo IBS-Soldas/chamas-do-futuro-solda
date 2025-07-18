@@ -5,10 +5,17 @@ import { Progress } from "@/components/ui/progress";
 import { BookOpen, FileText, Award, Clock, Users, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { Outlet } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { useFirebase } from '@/contexts/FirebaseContext';
+
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const userEmail = localStorage.getItem('userEmail') || 'Aluno';
+  const { auth } = useFirebase()
+  const user = auth.currentUser
+  console.log(user)
 
   const stats = [
     {
@@ -39,6 +46,7 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
+      <Outlet />
       {/* Welcome Section */}
       <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 backdrop-blur-md border border-orange-500/20 rounded-lg p-6">
         <h1 className="text-3xl font-bold text-white mb-2">
@@ -92,7 +100,7 @@ const Dashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <Button 
+            <Button
               onClick={() => navigate('/dashboard/aulas')}
               className="w-full bg-blue-500 hover:bg-blue-600"
             >
@@ -116,7 +124,7 @@ const Dashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <Button 
+            <Button
               onClick={() => navigate('/dashboard/apostilas')}
               className="w-full bg-green-500 hover:bg-green-600"
             >
@@ -140,7 +148,7 @@ const Dashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <Button 
+            <Button
               onClick={() => navigate('/dashboard/certificados')}
               className="w-full bg-yellow-500 hover:bg-yellow-600 text-black"
             >

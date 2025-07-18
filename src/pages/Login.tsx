@@ -6,33 +6,68 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff, Flame } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useFirebase } from '@/contexts/FirebaseContext';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast'; // If you have a toast hook
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [formError, setFormError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const { user, loading } = useFirebase();
+  const { signIn, error } = useAuth();
+  const { toast } = useToast(); // If you use a toast system
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simular login - em produção, conectar com Supabase
-    if (email && password) {
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userEmail', email);
-      navigate('/dashboard');
+    setFormError('');
+
+    if (loading) return;
+
+    try {
+      await signIn(email, password);
+      console.log('Login successful');
+      toast({
+        title: 'Login realizado com sucesso',
+        // description: 'Bem vindo a área do aluno',
+        variant: 'default',
+        duration: 2000,
+      });
+      navigate('/dashboard')
+      ;
+    } catch (err: any) {
+      // Show toast if available, otherwise set error state
+      console.log(err)
+      if (toast) {
+        toast({
+          title: 'Erro ao fazer login',
+          description:  'Não foi possível conectar. Verifique suas credenciais e conexão.',
+          variant: 'destructive',
+        });
+      } else {
+        setFormError( 'Não foi possível conectar. Verifique suas credenciais e conexão.');
+      }
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23f97316%22%20fill-opacity%3D%220.1%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%224%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
-      
+
       <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-orange-500/20 shadow-2xl">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
-            <div className="p-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-full welding-glow">
-              <Flame className="h-8 w-8 text-white" />
-            </div>
+              {/* <Flame className="h-8 w-8 text-white" /> */}
+              <div className="p-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-full welding-glow">
+                <img
+                  src="/logo.png"
+                  alt="Logo"
+                  className="h-12 w-12 object-contain"
+                />
+              </div>
           </div>
           <CardTitle className="text-2xl font-bold text-white">
             Área do Aluno
@@ -41,7 +76,7 @@ const Login = () => {
             Entre com suas credenciais para acessar o portal
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
@@ -58,7 +93,7 @@ const Login = () => {
                 className="bg-white/10 border-orange-500/30 text-white placeholder:text-gray-400 focus:border-orange-500 focus:ring-orange-500/20"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="password" className="text-white font-medium">
                 Senha
@@ -84,7 +119,11 @@ const Login = () => {
                 </Button>
               </div>
             </div>
-            
+
+            {formError && (
+              <div className="text-red-500 text-sm mt-2">{formError}</div>
+            )}
+
             <Button
               type="submit"
               className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-3 rounded-lg transition-all duration-300 glow-orange"
@@ -92,7 +131,7 @@ const Login = () => {
               Entrar
             </Button>
           </form>
-          
+
           <div className="mt-6 text-center">
             <Button
               variant="link"

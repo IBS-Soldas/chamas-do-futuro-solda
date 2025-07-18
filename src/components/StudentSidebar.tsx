@@ -52,8 +52,15 @@ export function StudentSidebar() {
     <Sidebar className={`${state === "collapsed" ? "w-16" : "w-64"} bg-slate-900 border-r border-orange-500/20`}>
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg welding-glow">
+          {/* <div className="p-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg welding-glow">
             <Flame className="h-6 w-6 text-white" />
+          </div> */}
+          <div className="p-1 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg welding-glow">
+            <img
+              src="/logo.png"
+              alt="Logo"
+              className="h-10 w-10 object-contain"
+            />
           </div>
           {state !== "collapsed" && (
             <div>
@@ -66,7 +73,7 @@ export function StudentSidebar() {
 
       <SidebarContent className="px-2">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-gray-400 text-xs uppercase tracking-wider mb-3">
+          <SidebarGroupLabel className="text-gray-400 text-xs uppercase tracking-wider mb-2">
             {state !== "collapsed" && "Navegação"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -78,9 +85,9 @@ export function StudentSidebar() {
                   end
                   className={({ isActive }) =>
                     (isActive
-                      ? "flex items-center w-full bg-white text-orange-500 rounded-md px-2 py-1"
+                      ? "flex items-center w-full bg-white text-orange-500 rounded-lg px-2 py-2"
                       : "flex items-center w-full"
-                        + " bg-[#22272b] text-orange-500 hover:bg-white/10 hover:text-white rounded-md px-2 py-1"
+                        + " bg-[#22272b] text-orange-500 hover:bg-white/10 hover:text-white rounded-md px-2 py-2"
                     ) + " focus:outline-none"
                   }
                 >
@@ -96,12 +103,12 @@ export function StudentSidebar() {
       <SidebarFooter className="p-4 border-t border-orange-500/20">
         <div className="flex items-center gap-3 mb-4">
           <div className="p-2 bg-blue-500/20 rounded-full">
-            <User className="h-4 w-4 text-blue-400" />
+            <User className="h-4 w-4 text-blue-300" />
           </div>
           {state !== "collapsed" && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate text-gray-400">{userEmail}</p>
-              <p className="text-gray-400 text-xs">Estudante</p>
+              <p className="text-sm font-medium truncate text-gray-200">{userEmail}</p>
+              <p className="text-gray-200 text-xs">Estudante</p>
             </div>
           )}
         </div>
@@ -109,7 +116,7 @@ export function StudentSidebar() {
         <Button
           onClick={handleLogout}
           variant="ghost"
-          className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-500/10"
+          className="w-full justify-start text-red-400 hover:text-red-200 hover:bg-red-500/20"
         >
           <LogOut className="h-4 w-4" />
           {state !== "collapsed" && <span className="ml-3">Sair</span>}

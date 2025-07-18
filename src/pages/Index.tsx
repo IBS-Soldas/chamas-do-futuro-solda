@@ -101,8 +101,12 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg welding-glow">
-                <Flame className="h-8 w-8 text-white" />
+              <div className="p-1 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg welding-glow">
+                <img
+                  src="/logo.png"
+                  alt="Logo"
+                  className="h-12 w-12 object-contain"
+                />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-white">Escola de Soldagem</h1>
@@ -305,8 +309,12 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="p-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg">
-                  <Flame className="h-6 w-6 text-white" />
+                <div className="p-1 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg welding-glow">
+                  <img
+                    src="/logo.png"
+                    alt="Logo"
+                    className="h-10 w-10 object-contain"
+                  />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-white">Escola de Soldagem</h3>

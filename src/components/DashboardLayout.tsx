@@ -5,12 +5,6 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { StudentSidebar } from './StudentSidebar';
 
 const DashboardLayout = () => {
-  const isLoggedIn = localStorage.getItem('isLoggedIn');
-
-  if (!isLoggedIn) {
-    return <Navigate to="/login" replace />;
-  }
-
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-slate-900">
