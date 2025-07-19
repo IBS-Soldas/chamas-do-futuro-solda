@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,9 @@ import { Progress } from "@/components/ui/progress";
 import { Play, CheckCircle, Lock, Clock } from "lucide-react";
 
 const Lessons = () => {
-  const [completedLessons, setCompletedLessons] = useState([1, 2, 3, 4, 5, 6, 7, 8]);
+  const [completedLessons, setCompletedLessons] = useState<number[]>([1, 2, 3, 4, 5, 6, 7, 8]);
+  const [videoOpen, setVideoOpen] = useState(false);
+  const [videoUrl, setVideoUrl] = useState("");
 
   const lessons = [
     {
@@ -14,56 +15,64 @@ const Lessons = () => {
       title: "Introdução à Soldagem",
       description: "Conceitos básicos e história da soldagem",
       duration: "45 min",
-      completed: true
+      completed: true,
+      videoUrl: "https://www.youtube.com/embed/fsV5mv4ERYs"
     },
     {
       id: 2,
       title: "Equipamentos de Segurança",
       description: "EPIs essenciais para soldagem",
       duration: "30 min",
-      completed: true
+      completed: true,
+      videoUrl: "https://www.youtube.com/embed/fsV5mv4ERYs"
     },
     {
       id: 3,
       title: "Tipos de Soldagem",
       description: "Soldagem por eletrodo, MIG, TIG e outros",
       duration: "60 min",
-      completed: true
+      completed: true,
+      videoUrl: "https://www.youtube.com/embed/fsV5mv4ERYs"
     },
     {
       id: 4,
       title: "Preparação de Materiais",
       description: "Como preparar metais para soldagem",
       duration: "40 min",
-      completed: true
+      completed: true,
+      videoUrl: "https://www.youtube.com/embed/fsV5mv4ERYs"
     },
     {
       id: 5,
       title: "Soldagem por Eletrodo - Teoria",
       description: "Fundamentos da soldagem por eletrodo",
       duration: "50 min",
-      completed: true
+      completed: true,
+      videoUrl: "https://www.youtube.com/embed/fsV5mv4ERYs"
     },
     {
       id: 6,
       title: "Soldagem por Eletrodo - Prática",
       description: "Exercícios práticos básicos",
       duration: "90 min",
-      completed: true
+      completed: true,
+      videoUrl: "https://www.youtube.com/embed/fsV5mv4ERYs"
     },
     {
       id: 7,
       title: "Soldagem MIG - Teoria",
       description: "Princípios da soldagem MIG/MAG",
       duration: "45 min",
-      completed: true
+      completed: true,
+      videoUrl: "https://www.youtube.com/embed/fsV5mv4ERYs"
     },
     {
       id: 8,
       title: "Soldagem MIG - Prática",
       description: "Exercícios práticos com MIG",
       duration: "90 min",
-      completed: true
+      completed: true,
+      videoUrl: "https://www.youtube.com/embed/fsV5mv4ERYs"
     },
     {
       id: 9,
@@ -71,42 +80,75 @@ const Lessons = () => {
       description: "Fundamentos da soldagem TIG",
       duration: "45 min",
       completed: false,
-      current: true
+      current: true,
+      videoUrl: "https://www.youtube.com/embed/fsV5mv4ERYs"
     },
     {
       id: 10,
       title: "Soldagem TIG - Prática",
       description: "Exercícios práticos com TIG",
       duration: "90 min",
-      completed: false
+      completed: false,
+      videoUrl: "https://www.youtube.com/embed/fsV5mv4ERYs"
     },
     {
       id: 11,
       title: "Inspeção e Qualidade",
       description: "Como avaliar a qualidade da soldagem",
       duration: "35 min",
-      completed: false
+      completed: false,
+      videoUrl: "https://www.youtube.com/embed/fsV5mv4ERYs"
     },
     {
       id: 12,
       title: "Certificação Final",
       description: "Teste prático para certificação",
       duration: "120 min",
-      completed: false
+      completed: false,
+      videoUrl: "https://www.youtube.com/embed/fsV5mv4ERYs"
     }
   ];
 
   const progressPercentage = (completedLessons.length / lessons.length) * 100;
 
-  const handleWatchLesson = (lessonId: number) => {
-    // Simular assistir aula
+  const handleWatchLesson = (lessonId: number, video: string) => {
     if (!completedLessons.includes(lessonId)) {
       setCompletedLessons([...completedLessons, lessonId]);
     }
+
+    setVideoUrl(video);
+    setVideoOpen(true);
   };
 
   return (
     <div className="space-y-6">
+
+  
+      {videoOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="relative w-full max-w-4xl p-4">
+            <div className="aspect-video w-full">
+              <iframe
+                width="100%"
+                height="100%"
+                src={videoUrl}
+                title="YouTube player"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="rounded-lg w-full h-full"
+              ></iframe>
+            </div>
+            <button
+              onClick={() => setVideoOpen(false)}
+              className="absolute top-2 right-2 text-white text-xl bg-red-500 hover:bg-red-600 px-3 py-1 rounded"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
+   
       <div className="bg-gradient-to-r from-blue-500/10 to-indigo-500/10 backdrop-blur-md border border-blue-500/20 rounded-lg p-6">
         <h1 className="text-3xl font-bold text-white mb-4">Aulas do Curso</h1>
         <div className="space-y-2">
@@ -121,6 +163,7 @@ const Lessons = () => {
         </div>
       </div>
 
+ 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {lessons.map((lesson) => {
           const isCompleted = completedLessons.includes(lesson.id);
@@ -166,7 +209,7 @@ const Lessons = () => {
                     {lesson.duration}
                   </div>
                   <Button
-                    onClick={() => handleWatchLesson(lesson.id)}
+                    onClick={() => handleWatchLesson(lesson.id, lesson.videoUrl)}
                     disabled={!isAvailable}
                     className={
                       isCompleted
