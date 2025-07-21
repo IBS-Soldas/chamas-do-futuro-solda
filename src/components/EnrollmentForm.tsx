@@ -41,9 +41,10 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [signatureRef, setSignatureRef] = useState<{ getSignatureAsBase64: () => string | null } | null>(null);
-
+  const [paymentData, setPaymentData] = useState<any>(null);
   // Fetch courses from Firebase
   const { data: courses = [], isLoading: coursesLoading, error: coursesError } = useCourses();
+  const [copied, setCopied] = useState(false);
 
   // Fetch all states from IBGE
   const { data: states = [], isLoading: statesLoading, error: statesError } = useBrazilStates();
@@ -54,7 +55,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: name === 'phone' ? formatPhone(value) : value
     }));
   };
 
@@ -97,6 +98,26 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
       value: total
     }));
   }, [formData.courseIds]);
+
+  function formatPhone(value: string) {
+    // Remove all non-digit characters
+    value = value.replace(/\D/g, '');
+
+    // Format as (99) 99999-9999 or (99) 9999-9999
+    if (value.length > 11) value = value.slice(0, 11);
+
+    if (value.length > 10) {
+      // Mobile
+      return value.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+    } else if (value.length > 6) {
+      // Landline
+      return value.replace(/^(\d{2})(\d{4,5})(\d{0,4}).*/, '($1) $2-$3');
+    } else if (value.length > 2) {
+      return value.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+    } else {
+      return value;
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,6 +165,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
       setIsSubmitting(true);
       const response = await axios.post('https://api-jljbku3rxq-uc.a.run.app/create-payment', formData);
       console.log(response.data)
+      setPaymentData(response.data)
       // Optionally handle the result here (e.g., show a success message, redirect, etc.)
       toast({
         title: "Inscrição enviada!",
@@ -166,26 +188,26 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
   const handlePaymentConfirmation = async () => {
     setIsSubmitting(true);
 
-    // try {
-    //   // Simulate payment processing
-    //   await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      // Simulate payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
-    //   // Simulate form submission
-    //   toast({
-    //     title: "Inscrição realizada com sucesso!",
-    //     description: "Entraremos em contato em breve para confirmar sua matrícula.",
-    //   });
-    //   onClose();
-    // } catch (err) {
-    //   toast({
-    //     title: "Erro no pagamento",
-    //     description: "Ocorreu um erro ao processar o pagamento. Tente novamente.",
-    //     variant: "destructive"
-    //   });
-    // } finally {
-    //   setIsSubmitting(false);
-    //   setShowPaymentModal(false);
-    // }
+      // Simulate form submission
+      toast({
+        title: "Inscrição realizada com sucesso!",
+        description: "Entraremos em contato em breve para confirmar sua matrícula.",
+      });
+      onClose();
+    } catch (err) {
+      toast({
+        title: "Erro no pagamento",
+        description: "Ocorreu um erro ao processar o pagamento. Tente novamente.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+      setShowPaymentModal(false);
+    }
   };
 
   const getTotalPrice = () => {
@@ -252,6 +274,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                         placeholder="12345678912"
                         // required
                         className="mt-1"
+                        maxLength={11}
                       />
                     </div>
                     <div>
@@ -264,6 +287,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                         placeholder="(11) 99999-9999"
                         // required
                         className="mt-1"
+                        maxLength={15}
                       />
                     </div>
                   </div>
@@ -339,6 +363,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                       onChange={handleInputChange}
                       placeholder="Seu endereço completo"
                       className="mt-1"
+                      maxLength={85}
                     // required
                     />
                   </div>
@@ -561,7 +586,11 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
               <>
                 <div className="flex justify-center">
                   <div className="bg-white p-4 rounded-lg border-2 border-gray-300">
-                    <QrCode className="h-48 w-48 text-gray-400" />
+                    <img
+                      src={paymentData?.qrCode ? `data:image/png;base64,${paymentData.qrCode}` : ""}
+                      alt="QR Code do PIX"
+                      className="h-48 w-48 object-contain text-gray-400"
+                    />
                     <p className="text-center text-sm text-gray-500 mt-2">QR Code do PIX</p>
                   </div>
                 </div>
@@ -570,7 +599,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                   <Label className="text-sm font-medium text-gray-700">Código PIX:</Label>
                   <div className="flex gap-2">
                     <Input
-                      value="00020126580014br.gov.bcb.pix0136123e4567-e12b-12d1-a456-426614174000520400005303986540599.005802BR5913Chamas do Futuro6009Sao Paulo62070503***6304E2CA"
+                      value={paymentData?.payload || "000201..."}
                       readOnly
                       className="bg-gray-100 text-gray-600 text-xs"
                     />
@@ -578,7 +607,13 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => navigator.clipboard.writeText("00020126580014br.gov.bcb.pix0136123e4567-e12b-12d1-a456-426614174000520400005303986540599.005802BR5913Chamas do Futuro6009Sao Paulo62070503***6304E2CA")}
+                      onClick={() => {
+                        navigator.clipboard.writeText(paymentData?.payload || '');
+                        toast({
+                          title: "Código copiado!",
+                          description: "O código PIX foi copiado para a área de transferência.",
+                        });
+                      }}
                     >
                       Copiar
                     </Button>
@@ -588,15 +623,12 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
             ) : (
               <>
                 <div className="flex justify-center">
-                  <div
-                    className="bg-white p-4 rounded-lg border-2 border-gray-300 cursor-pointer hover:border-orange-500 transition-colors"
-                    onClick={() => {
-                      // Create a sample PDF download (replace with your actual PDF generation)
-                      const link = document.createElement('a');
-                      link.href = '/boleto-example.pdf'; // Replace with your actual PDF path
-                      link.download = `boleto-${Date.now()}.pdf`;
-                      link.click();
-                    }}
+                  <a
+                      className="bg-white p-4 rounded-lg border-2 border-gray-300 cursor-pointer hover:border-orange-500 transition-colors"
+                      href={paymentData?.bankSlipUrl || ''}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download={`boleto-${Date.now()}.pdf`}
                   >
                     <div className="w-48 h-48 bg-gray-100 rounded flex items-center justify-center">
                       <div className="text-center">
@@ -605,10 +637,10 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                         <p className="text-xs text-gray-500">Boleto Bancário</p>
                       </div>
                     </div>
-                  </div>
+                  </a>
                 </div>
 
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <Label className="text-sm font-medium text-gray-700">Código do Boleto:</Label>
                   <div className="flex gap-2">
                     <Input
@@ -625,7 +657,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                       Copiar
                     </Button>
                   </div>
-                </div>
+                </div> */}
               </>
             )}
 
@@ -639,7 +671,10 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
 
             <div className="flex gap-3">
               <Button
-                onClick={handlePaymentConfirmation}
+                onClick={() => {
+                  setShowPaymentModal(false)
+                  onClose()
+                }}
                 disabled={isSubmitting}
                 className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
               >
