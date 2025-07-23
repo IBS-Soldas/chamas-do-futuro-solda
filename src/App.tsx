@@ -29,7 +29,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/sobre" element={<About />} />
             <Route path="/login" element={<Login />} />
-            <Route 
+            <Route
               path="/dashboard"
               element={
                 <PrivateRoute>
@@ -37,12 +37,10 @@ const App = () => (
                 </PrivateRoute>
               }
             >
-              <Route path="/dashboard" element={<DashboardLayout />}>
-                <Route index element={<Dashboard />} />
-                <Route path="aulas" element={<Lessons />} />
-                <Route path="apostilas" element={<Materials />} />
-                <Route path="certificados" element={<Certificates />} />
-              </Route>
+              <Route index element={<Dashboard />} />
+              <Route path="aulas" element={<Lessons />} />
+              <Route path="apostilas" element={<Materials />} />
+              <Route path="certificados" element={<Certificates />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
