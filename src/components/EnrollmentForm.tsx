@@ -671,6 +671,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
 
             <div className="flex gap-3">
               <Button
+                // onClick={handlePaymentConfirmation}
                 onClick={() => {
                   setShowPaymentModal(false)
                   onClose()

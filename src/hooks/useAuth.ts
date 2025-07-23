@@ -10,7 +10,7 @@ import {
 import { useFirebase } from '@/contexts/FirebaseContext';
 
 export const useAuth = () => {
-    const { auth } = useFirebase();
+    const { auth, user } = useFirebase();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -88,6 +88,7 @@ export const useAuth = () => {
     };
 
     return {
+        user,
         signIn,
         signUp,
         signOut: signOutUser,
