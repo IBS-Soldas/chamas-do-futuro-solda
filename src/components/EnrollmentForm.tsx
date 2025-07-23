@@ -429,29 +429,46 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {courses.map((course) => (
+                    {courses.map((course, idx) => (
                       <div
                         key={course.id}
-                        className={`p-4 border rounded-lg transition-all duration-200 ${formData.courseIds.includes(course.id)
-                          ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
-                          : 'border-gray-200 hover:border-gray-300'
-                          }`}
+                        className={`flex flex-col md:flex-row items-center md:items-center p-4 border rounded-lg transition-all duration-200 min-h-[220px] md:min-h-[180px] h-full ${
+                          formData.courseIds.includes(course.id)
+                            ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                        style={{ minHeight: 220, height: "100%" }} // fallback para navegadores sem Tailwind JIT
                       >
-                        <div className="flex items-start space-x-3">
+                        {/* Imagem */}
+                        <div className="flex-shrink-0 flex justify-center items-center w-full md:w-auto mb-4 md:mb-0 md:mr-6">
+                          <img
+                            src={
+                              idx % 3 === 0
+                                ? "https://www.soldaeletrica.com.br/imagens/mpi/servicos-de-soldas-especiais-02.jpg"
+                                : idx % 3 === 1
+                                ? "https://blog.chicosoldas.com.br/wp-content/uploads/2023/03/soldagem.jpg"
+                                : "https://tse1.mm.bing.net/th/id/OIP.0FHL4o5gHHvLctxgfGTF6wHaE5?w=859&h=569&rs=1&pid=ImgDetMain&o=7&rm=3"
+                            }
+                            alt="Capa do curso"
+                            className="w-32 h-32 object-cover rounded-md border shadow-md"
+                          />
+                        </div>
+                        {/* Conteúdo */}
+                        <div className="flex-1 flex flex-row items-center w-full">
                           <Checkbox
                             id={course.id}
                             checked={formData.courseIds.includes(course.id)}
                             onCheckedChange={(checked) =>
                               handleCourseChange(course.id, checked as boolean)
                             }
-                            className="mt-1"
+                            className="mt-1 mr-3"
                           />
-                          <div className="flex-1">
+                          <div className="flex-1 flex flex-col justify-center h-full">
                             <Label htmlFor={course.id} className="font-semibold cursor-pointer">
                               {course.name}
                             </Label>
                             <p className="text-sm text-gray-600 mt-1">{course.description}</p>
-                            <div className="flex justify-between items-center mt-2">
+                            <div className="flex justify-between items-center mt-2 flex-wrap gap-2">
                               <span className="text-sm text-gray-500">{course.duration}</span>
                               <span className="font-bold text-orange-600">
                                 R$ {course.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
