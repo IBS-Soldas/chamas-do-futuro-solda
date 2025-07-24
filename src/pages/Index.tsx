@@ -50,6 +50,7 @@ const Index = () => {
   ];
 
   const courses = [
+    // Cursos originais
     {
       title: "Soldagem por Eletrodo",
       description: "Curso básico de soldagem por eletrodo revestido (SMAW)",
@@ -70,6 +71,78 @@ const Index = () => {
       duration: "80 horas",
       price: "R$ 1.890",
       features: ["Técnicas avançadas", "Projeto final", "Mentoria individual"]
+    },
+
+    // Novos cursos (sem imagem, sem features)
+    {
+      title: "Fundamentos da Soldagem",
+      description: "Melhor curso de Fundamentos de Soldagem do mercado, se torne um melhor profissional",
+      duration: "35 horas",
+      price: "R$ 1.700,00",
+      features: ["Técnicas avançadas", "Projeto final", "Mentoria individual"]
+    },
+    {
+      title: "Corte por Plasma",
+      description: "Técnicas avançadas para soldagem de estruturas metálicas de grande porte",
+      duration: "40 horas",
+      price: "R$ 999,00",
+      features: ["Equipamentos modernos", "Práticas intensivas", "Suporte pós-curso"]
+    },
+    {
+      title: "Chaparia - 3G",
+      description: "A área da indústria da soldagem oferece diversas oportunidades! 🚀 Você pode atuar em setores como: �� Indústria naval",
+      duration: "30 horas",
+      price: "R$ 2.500,00",
+      features: ["Técnicas avançadas", "Projeto final", "Mentoria individual"]
+    },
+    {
+      title: "MIG/MAG",
+      description: "O Curso de Soldador MIG/MAG - 3G (Chaparia) é a oportunidade que você esperava para conquistar sua qualificação profissional e atuar nos setores mais valorizados do mercado",
+      duration: "40 horas",
+      price: "R$ 2.500,00",
+      features: ["Equipamentos modernos", "Práticas intensivas", "Suporte pós-curso"]
+    },
+    {
+      title: "Tubulação - 6G",
+      description: "O curso de Soldador 6G - Tubulação (Qualificação Máxima) 🛠️ é ideal para quem quer se destacar na indústria e conquistar as melhores oportunidades!",
+      duration: "30 horas",
+      price: "R$ 3.800,00",
+      features: ["Técnicas avançadas", "Projeto final", "Mentoria individual"]
+    },
+    {
+      title: "Maçariqueiro Industrial",
+      description: "O mercado está com alta demanda por Maçariqueiros Industriais venha se profissionalizar conosco",
+      duration: "50 horas",
+      price: "R$ 1.400,00",
+      features: ["Equipamentos modernos", "Práticas intensivas", "Suporte pós-curso"]
+    },
+    {
+      title: "Inspetor de soldagem N1",
+      description: "O mercado está com alta demanda por Maçariqueiros Industriais venha se profissionalizar conosco",
+      duration: "35 horas",
+      price: "R$ 997,00",
+      features: ["Técnicas avançadas", "Projeto final", "Mentoria individual"]
+    },
+    {
+      title: "Eletrodo Revestido",
+      description: "O mercado está com alta demanda por Maçariqueiros Industriais venha se profissionalizar conosco",
+      duration: "35 horas",
+      price: "R$ 3.500,00",
+      features: ["Técnicas avançadas", "Projeto final", "Mentoria individual"]
+    },
+    {
+      title: "TIG Chaparia",
+      description: "Melhor curso de TIG Chaparia do mercado, se torne um melhor profissional",
+      duration: "40 horas",
+      price: "R$ 2.500,00",
+      features: ["Técnicas avançadas", "Projeto final", "Mentoria individual"]
+    },
+    {
+      title: "Soldas em Ferros Grandes",
+      description: "Técnicas avançadas para soldagem de estruturas metálicas de grande porte",
+      duration: "40 horas",
+      price: "R$ 1.200,00",
+      features: ["Equipamentos modernos", "Práticas intensivas", "Suporte pós-curso"]
     }
   ];
 
@@ -209,41 +282,66 @@ const Index = () => {
             <p className="text-xl text-gray-400">Programas completos para todos os níveis</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {courses.map((course, index) => (
-              <Card key={index} className="bg-white/10 backdrop-blur-md border-orange-500/20 hover:border-orange-500/40 transition-all duration-300 group hover:scale-105">
-                <CardHeader>
-                  <CardTitle className="text-white text-xl">{course.title}</CardTitle>
-                  <CardDescription className="text-gray-400">{course.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Duração:</span>
-                    <span className="text-orange-400 font-semibold">{course.duration}</span>
-                  </div>
-                  <div className="space-y-2">
-                    {course.features.map((feature, idx) => (
-                      <div key={idx} className="flex items-center space-x-2">
-                        <CheckCircle className="h-4 w-4 text-green-400" />
-                        <span className="text-gray-300 text-sm">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="pt-4 border-t border-gray-600">
-                    <div className="text-center">
-                      <span className="text-3xl font-bold text-orange-400">{course.price}</span>
-                      <p className="text-gray-400 text-sm">Parcelamento disponível</p>
-                    </div>
-                  </div>
-                  <Button 
-                    className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
-                    onClick={() => setIsEnrollmentOpen(true)}
+          <div className="overflow-x-auto">
+            <div className="flex gap-8 pb-2" style={{ minWidth: 320 }}>
+              {courses.map((course, index) => (
+                <div style={{ minWidth: 320, maxWidth: 340, flex: "0 0 auto" }}>
+                  {/* Card do curso */}
+                  <Card
+                    key={index}
+                    className="bg-white/10 backdrop-blur-md border-orange-500/20 hover:border-orange-500/40 transition-all duration-300 group scale-95 hover:scale-100 h-full flex flex-col"
                   >
-                    Matricular-se
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+                    <CardHeader>
+                      <CardTitle className="text-white text-xl text-center">
+                        {course.title}
+                      </CardTitle>
+                      <CardDescription className="text-gray-400 text-center min-h-[56px] max-h-[56px] overflow-hidden text-ellipsis">
+                        {course.description}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-1 flex flex-col justify-between space-y-4">
+                      <div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-400">Duração:</span>
+                          <span className="text-orange-400 font-semibold">
+                            {course.duration}
+                          </span>
+                        </div>
+                        <div className="space-y-2 mt-2">
+                          {(course.features && course.features.length > 0
+                            ? course.features
+                            : [
+                                "Certificado reconhecido",
+                                "Aulas práticas",
+                                "Instrutores experientes"
+                              ]
+                          ).slice(0, 3).map((feature, idx) => (
+                            <div key={feature + idx} className="flex items-center space-x-2">
+                              <CheckCircle className="h-4 w-4 text-green-400" />
+                              <span className="text-gray-300 text-sm">{feature}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="pt-4 border-t border-gray-600">
+                        <div className="text-center">
+                          <span className="text-3xl font-bold text-orange-400">
+                            {course.price}
+                          </span>
+                          <p className="text-gray-400 text-sm">Parcelamento disponível</p>
+                        </div>
+                      </div>
+                      <Button 
+                        className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+                        onClick={() => setIsEnrollmentOpen(true)}
+                      >
+                        Matricular-se
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
