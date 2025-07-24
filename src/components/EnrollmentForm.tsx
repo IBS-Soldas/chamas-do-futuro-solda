@@ -34,7 +34,8 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
     courseIds: [] as string[],
     value: 0,
     signature: '',
-    billingType: 'PIX'
+    billingType: 'PIX',
+    courseOptions: {} as Record<string, string>,
   });
 
   const [paymentMethod, setPaymentMethod] = useState<'PIX' | 'BOLETO'>('PIX');
@@ -44,6 +45,13 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
   const [paymentData, setPaymentData] = useState<any>(null);
   // Fetch courses from Firebase
   const { data: courses = [], isLoading: coursesLoading, error: coursesError } = useCourses();
+
+  const activeCourses = courses.filter(course => course.isActive);
+  const inactiveCourses = courses.filter(course => !course.isActive);
+
+  useEffect(() => {
+    console.log(courses)
+  }, [courses])
   const [copied, setCopied] = useState(false);
 
   // Fetch all states from IBGE
@@ -75,12 +83,24 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
   };
 
   const handleCourseChange = (courseId: string, checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      courseIds: checked
+    setFormData(prev => {
+      let newCourseIds = checked
         ? [...prev.courseIds, courseId]
-        : prev.courseIds.filter(id => id !== courseId)
-    }));
+        : prev.courseIds.filter(id => id !== courseId);
+      let newCourseOptions = { ...prev.courseOptions };
+      if (checked) {
+        if (!newCourseOptions[courseId]) {
+          newCourseOptions[courseId] = 'option1';
+        }
+      } else {
+        delete newCourseOptions[courseId];
+      }
+      return {
+        ...prev,
+        courseIds: newCourseIds,
+        courseOptions: newCourseOptions,
+      };
+    });
   };
 
   const handleSignatureChange = (signature: string) => {
@@ -423,21 +443,23 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                       Recarregar
                     </Button>
                   </div>
-                ) : courses.length === 0 ? (
+                ) : activeCourses.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-gray-500">Nenhum curso disponível no momento.</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {courses.map((course, idx) => (
+                    {activeCourses.map((course, idx) => (
                       <div
                         key={course.id}
-                        className={`flex flex-col md:flex-row items-center md:items-center p-4 border rounded-lg transition-all duration-200 min-h-[220px] md:min-h-[180px] h-full ${
-                          formData.courseIds.includes(course.id)
-                            ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                        style={{ minHeight: 220, height: "100%" }} // fallback para navegadores sem Tailwind JIT
+                        className={`flex flex-col md:flex-row items-center md:items-center p-4 border rounded-lg transition-all duration-200 min-h-[220px] md:min-h-[180px] h-full ${formData.courseIds.includes(course.id)
+                          ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
+                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-400/10'
+                          }`}
+                        onClick={() =>
+                          handleCourseChange(course.id, !formData.courseIds.includes(course.id))
+                        }
+                        style={{ minHeight: 220, height: "100%", cursor: "pointer" }}
                       >
                         {/* Imagem */}
                         <div className="flex-shrink-0 flex justify-center items-center w-full md:w-auto mb-4 md:mb-0 md:mr-6">
@@ -446,8 +468,8 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                               idx % 3 === 0
                                 ? "https://www.soldaeletrica.com.br/imagens/mpi/servicos-de-soldas-especiais-02.jpg"
                                 : idx % 3 === 1
-                                ? "https://blog.chicosoldas.com.br/wp-content/uploads/2023/03/soldagem.jpg"
-                                : "https://tse1.mm.bing.net/th/id/OIP.0FHL4o5gHHvLctxgfGTF6wHaE5?w=859&h=569&rs=1&pid=ImgDetMain&o=7&rm=3"
+                                  ? "https://blog.chicosoldas.com.br/wp-content/uploads/2023/03/soldagem.jpg"
+                                  : "https://tse1.mm.bing.net/th/id/OIP.0FHL4o5gHHvLctxgfGTF6wHaE5?w=859&h=569&rs=1&pid=ImgDetMain&o=7&rm=3"
                             }
                             alt="Capa do curso"
                             className="w-32 h-32 object-cover rounded-md border shadow-md"
@@ -455,14 +477,6 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                         </div>
                         {/* Conteúdo */}
                         <div className="flex-1 flex flex-row items-center w-full">
-                          <Checkbox
-                            id={course.id}
-                            checked={formData.courseIds.includes(course.id)}
-                            onCheckedChange={(checked) =>
-                              handleCourseChange(course.id, checked as boolean)
-                            }
-                            className="mt-1 mr-3"
-                          />
                           <div className="flex-1 flex flex-col justify-center h-full">
                             <Label htmlFor={course.id} className="font-semibold cursor-pointer">
                               {course.name}
@@ -474,6 +488,52 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                                 R$ {course.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                               </span>
                             </div>
+
+                            {/* Two side-by-side radio options at the bottom of the card */}
+                            {course?.additionalCourse && formData.courseIds.includes(course.id) && (
+                              <div className="flex gap-1 pt-5 text-gray-600">
+                                <label className="flex items-center gap-0.5 text-xs" onClick={e => e.stopPropagation()}
+>
+                                  <input
+                                    type="radio"
+                                    name={`courseOption-${course.id}`}
+                                    value="option1"
+                                    checked={formData.courseOptions?.[course.id] === 'option1'}
+                                    onClick={e => e.stopPropagation()}
+                                    onChange={e => {
+                                      setFormData(prev => ({
+                                        ...prev,
+                                        courseOptions: {
+                                          ...prev.courseOptions,
+                                          [course.id]: 'option1',
+                                        },
+                                      }));
+                                    }}
+                                  />
+                                  Chaparia 30h
+                                </label>
+                                <label className="flex items-center gap-0.5 text-xs" onClick={e => e.stopPropagation()}>
+                                  <input
+                                    type="radio"
+                                    name={`courseOption-${course.id}`}
+                                    value="option2"
+                                    checked={formData.courseOptions?.[course.id] === 'option2'}
+                                    onChange={e => {
+                                      e.stopPropagation();
+                                      setFormData(prev => ({
+                                        ...prev,
+                                        courseOptions: {
+                                          ...prev.courseOptions,
+                                          [course.id]: 'option2',
+                                        },
+                                      }));
+                                    }}
+                                  />
+                                  Tubulação 60h
+                                </label>
+                              </div>
+                            )}
+
                           </div>
                         </div>
                       </div>
@@ -581,10 +641,10 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
             </div>
           </form>
         </div>
-      </div>
+      </div >
 
       {/* Payment Modal */}
-      <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
+      < Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal} >
         <DialogContent className="bg-white/95 backdrop-blur-md border-orange-500/20 max-w-md">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-gray-900">
@@ -641,11 +701,11 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
               <>
                 <div className="flex justify-center">
                   <a
-                      className="bg-white p-4 rounded-lg border-2 border-gray-300 cursor-pointer hover:border-orange-500 transition-colors"
-                      href={paymentData?.bankSlipUrl || ''}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      download={`boleto-${Date.now()}.pdf`}
+                    className="bg-white p-4 rounded-lg border-2 border-gray-300 cursor-pointer hover:border-orange-500 transition-colors"
+                    href={paymentData?.bankSlipUrl || ''}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download={`boleto-${Date.now()}.pdf`}
                   >
                     <div className="w-48 h-48 bg-gray-100 rounded flex items-center justify-center">
                       <div className="text-center">
@@ -709,6 +769,6 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </div >
   );
 };

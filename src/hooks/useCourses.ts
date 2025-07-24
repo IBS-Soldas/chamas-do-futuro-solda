@@ -10,6 +10,7 @@ export interface Course {
     isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
+    additionalCourse?: boolean; // Added to fix EnrollmentForm usage
 }
 
 export const useCourses = () => {
@@ -19,7 +20,7 @@ export const useCourses = () => {
             try {
                 // Fetch only active courses, ordered by creation date
                 const courses = await firestore.query<Course>('courses', [
-                    queryHelpers.where('isActive', '==', true),
+                    // queryHelpers.where('isActive', '==', true),
                     queryHelpers.orderBy('createdAt', 'desc')
                 ]);
 
