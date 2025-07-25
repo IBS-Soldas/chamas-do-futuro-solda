@@ -430,15 +430,15 @@ const Index = () => {
               <div className="space-y-2 text-gray-400">
                 <div className="flex items-center space-x-2">
                   <Phone className="h-4 w-4" />
-                  <span>(11) 99999-9999</span>
+                  <span>(24) 9 7400-8059</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Mail className="h-4 w-4" />
-                  <span>contato@escolasoldagem.com</span>
+                  <span>comercialbrsoldas@gmail.com</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <MapPin className="h-4 w-4" />
-                  <span>São Paulo, SP</span>
+                  <MapPin className="h-6 w-6" />
+                  <span>Rua Isalino Gomes da Silva, 993 - Paraíso, Barra Mansa - RJ, Brasil</span>
                 </div>
               </div>
             </div>
