@@ -31,11 +31,10 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
     address: '',
     neighborhood: '',
     number: '',
-    courseIds: [] as string[],
+    courses: [] as { id: number; time: number }[],
     value: 0,
     signature: '',
-    billingType: 'PIX',
-    courseOptions: {} as Record<string, string>,
+    billingType: 'PIX'
   });
 
   const [paymentMethod, setPaymentMethod] = useState<'PIX' | 'BOLETO'>('PIX');
@@ -49,9 +48,9 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
   const activeCourses = courses.filter(course => course.isActive);
   const inactiveCourses = courses.filter(course => !course.isActive);
 
-  useEffect(() => {
-    console.log(courses)
-  }, [courses])
+  // useEffect(() => {
+  //   console.log(courses)
+  // }, [courses])
   const [copied, setCopied] = useState(false);
 
   // Fetch all states from IBGE
@@ -83,22 +82,16 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
   };
 
   const handleCourseChange = (courseId: string, checked: boolean) => {
+    const course = courses.find(c => Number(c.id) === Number(courseId));
+    const defaultTime = course?.additionalCourse ? 30 : 0;
+
     setFormData(prev => {
       let newCourseIds = checked
-        ? [...prev.courseIds, courseId]
-        : prev.courseIds.filter(id => id !== courseId);
-      let newCourseOptions = { ...prev.courseOptions };
-      if (checked) {
-        if (!newCourseOptions[courseId]) {
-          newCourseOptions[courseId] = 'option1';
-        }
-      } else {
-        delete newCourseOptions[courseId];
-      }
+        ? [...prev.courses, { id: Number(courseId), time: defaultTime }]
+        : prev.courses.filter(obj => obj.id !== Number(courseId));
       return {
         ...prev,
-        courseIds: newCourseIds,
-        courseOptions: newCourseOptions,
+        courses: newCourseIds
       };
     });
   };
@@ -117,7 +110,8 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
       ...prev,
       value: total
     }));
-  }, [formData.courseIds]);
+    console.log(formData)
+  }, [formData.courses]);
 
   function formatPhone(value: string) {
     // Remove all non-digit characters
@@ -160,7 +154,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
       return;
     }
 
-    if (formData.courseIds.length === 0) {
+    if (formData.courses.length === 0) {
       toast({
         title: "Selecione um curso",
         description: "Por favor, selecione pelo menos um curso.",
@@ -231,8 +225,9 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
   };
 
   const getTotalPrice = () => {
-    return formData.courseIds.reduce((total, courseId) => {
-      const course = courses.find(c => c.id === courseId);
+    return formData.courses.reduce((total, obj) => {
+      const course = courses.find(c => Number(c.id) === Number(obj.id));
+      // console.log(activeCourses)
       return total + (course?.price || 0);
     }, 0);
   };
@@ -452,12 +447,12 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                     {activeCourses.map((course, idx) => (
                       <div
                         key={course.id}
-                        className={`flex flex-col md:flex-row items-center md:items-center p-4 border rounded-lg transition-all duration-200 min-h-[220px] md:min-h-[180px] h-full ${formData.courseIds.includes(course.id)
+                        className={`flex flex-col md:flex-row items-center md:items-center p-4 border rounded-lg transition-all duration-200 min-h-[220px] md:min-h-[180px] h-full ${formData.courses.some(obj => obj.id === Number(course.id))
                           ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
                           : 'border-gray-200 hover:border-gray-300 hover:bg-gray-400/10'
                           }`}
                         onClick={() =>
-                          handleCourseChange(course.id, !formData.courseIds.includes(course.id))
+                          handleCourseChange(course.id, !formData.courses.some(obj => Number(obj.id) === Number(course.id)))
                         }
                         style={{ minHeight: 220, height: "100%", cursor: "pointer" }}
                       >
@@ -490,23 +485,31 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                             </div>
 
                             {/* Two side-by-side radio options at the bottom of the card */}
-                            {course?.additionalCourse && formData.courseIds.includes(course.id) && (
+                            {course?.additionalCourse && formData.courses.some(obj => obj.id === Number(course.id)) && (
                               <div className="flex gap-1 pt-5 text-gray-600">
                                 <label className="flex items-center gap-0.5 text-xs" onClick={e => e.stopPropagation()}
->
+                                >
                                   <input
+                                    className='cursor-pointer'
                                     type="radio"
                                     name={`courseOption-${course.id}`}
-                                    value="option1"
-                                    checked={formData.courseOptions?.[course.id] === 'option1'}
+                                    value="30"
+                                    checked={
+                                      formData.courses.find(obj => obj.id === Number(course.id))?.time === 30 ||
+                                      formData.courses.find(obj => obj.id === Number(course.id))?.time === 0
+                                    }
+                                    defaultChecked={formData.courses.find(obj =>
+                                      obj.id === Number(course.id))?.time === 0}
                                     onClick={e => e.stopPropagation()}
                                     onChange={e => {
+                                      const value = e.target.value
                                       setFormData(prev => ({
                                         ...prev,
-                                        courseOptions: {
-                                          ...prev.courseOptions,
-                                          [course.id]: 'option1',
-                                        },
+                                        courses: prev.courses.map(obj =>
+                                          obj.id === Number(course.id)
+                                            ? { ...obj, time: Number(value) }
+                                            : obj)
+
                                       }));
                                     }}
                                   />
@@ -514,19 +517,23 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                                 </label>
                                 <label className="flex items-center gap-0.5 text-xs" onClick={e => e.stopPropagation()}>
                                   <input
+                                    className='cursor-pointer'
                                     type="radio"
                                     name={`courseOption-${course.id}`}
-                                    value="option2"
-                                    checked={formData.courseOptions?.[course.id] === 'option2'}
+                                    value="60"
+                                    checked={formData.courses.find(obj =>
+                                      obj.id === Number(course.id))?.time === 60}
+                                    onClick={e => e.stopPropagation()}
                                     onChange={e => {
-                                      e.stopPropagation();
+                                      const value = e.target.value
                                       setFormData(prev => ({
                                         ...prev,
-                                        courseOptions: {
-                                          ...prev.courseOptions,
-                                          [course.id]: 'option2',
-                                        },
+                                        courses: prev.courses.map(obj =>
+                                          obj.id === Number(course.id)
+                                            ? { ...obj, time: Number(value) }
+                                            : obj)
                                       }));
+                                      console.log(formData)
                                     }}
                                   />
                                   Tubulação 60h
@@ -541,7 +548,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                   </div>
                 )}
 
-                {formData.courseIds.length > 0 && (
+                {formData.courses.length > 0 && (
                   <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <div className="flex justify-between items-center">
                       <span className="font-semibold">Total dos Cursos Selecionados:</span>
@@ -550,7 +557,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 mt-2">
-                      {formData.courseIds.length} curso(s) selecionado(s)
+                      {formData.courses.length} curso(s) selecionado(s)
                     </p>
                   </div>
                 )}
@@ -574,7 +581,8 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                       billingType: value
                     }));
                     setPaymentMethod(value);
-                  }}>
+                  }}
+                  required>
                   <div className="flex items-center space-x-2 mb-3">
                     <RadioGroupItem value="PIX" id="PIX" />
                     <Label htmlFor="pix" className="flex items-center gap-2 cursor-pointer">
