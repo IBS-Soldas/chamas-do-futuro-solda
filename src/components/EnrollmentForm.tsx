@@ -14,6 +14,7 @@ import { CheckCircle, User, Mail, Phone, MapPin, CreditCard, QrCode, Loader2 } f
 import { useCourses, Course } from '@/hooks/useCourses';
 import { useBrazilStates, useBrazilCities, State as BrazilState, City as BrazilCity } from '@/hooks/useBrazilStatesCities';
 import axios from 'axios';
+import { usePoles } from '@/hooks/use-poles';
 
 interface EnrollmentFormProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ interface EnrollmentFormProps {
 
 export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
+    poleId: '',
     name: '',
     cpfCnpj: '',
     phone: '',
@@ -48,13 +50,14 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
   const activeCourses = courses.filter(course => course.isActive);
   const inactiveCourses = courses.filter(course => !course.isActive);
 
-  // useEffect(() => {
-  //   console.log(courses)
-  // }, [courses])
   const [copied, setCopied] = useState(false);
 
   // Fetch all states from IBGE
   const { data: states = [], isLoading: statesLoading, error: statesError } = useBrazilStates();
+  const { data: poles = [], isLoading: polesLoading, error: polesError } = usePoles();
+  // useEffect(() => {
+  //   console.log(poles)
+  // }, [activeCourses])
   // Fetch cities for selected state
   const { data: cities = [], isLoading: citiesLoading, error: citiesError } = useBrazilCities(formData.state);
 
@@ -71,6 +74,14 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
       ...prev,
       state: stateId,
       city: '' // Reset city when state changes
+    }));
+  };
+
+  const handlePoleChange = (poleId: string) => {
+    console.log(poleId)
+    setFormData(prev => ({
+      ...prev,
+      poleId: poleId,
     }));
   };
 
@@ -110,7 +121,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
       ...prev,
       value: total
     }));
-    console.log(formData)
+    // console.log(formData)
   }, [formData.courses]);
 
   function formatPhone(value: string) {
@@ -264,6 +275,21 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                   Preencha suas informações pessoais
                 </CardDescription>
               </CardHeader>
+              <CardContent className="space-y-1">
+                <Label htmlFor="state">Polo de Estudo *</Label>
+                <Select value={formData.poleId} onValueChange={handlePoleChange} disabled={polesLoading || !!polesError} required>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder={polesLoading ? 'Carregando polos...' : polesError ? 'Erro ao carregar polos' : 'Selecione um Polo'} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {poles.map((pole) => (
+                      <SelectItem key={pole.id} value={pole.id}>
+                        {pole.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </CardContent>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
