@@ -186,7 +186,7 @@ const Index = () => {
                 <p className="text-sm text-gray-400">Profissional & Certificada</p>
               </div>
             </div>
-            <nav className="hidden md:flex space-x-8">
+            <nav className="hidden md:flex items-center justify-center space-x-8">
               <a href="#cursos" className="text-white hover:text-orange-400 transition-colors">Cursos</a>
               <a href="#sobre" className="text-white hover:text-orange-400 transition-colors">Sobre</a>
               <a href="#depoimentos" className="text-white hover:text-orange-400 transition-colors">Depoimentos</a>
@@ -249,7 +249,7 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 relative">
+      <section id="sobre" className="py-20 relative">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">Por que escolher nossa escola?</h2>
