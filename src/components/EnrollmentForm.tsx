@@ -10,7 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { SignatureCanvas } from "@/components/SignatureCanvas";
-import { CheckCircle, User, Mail, Phone, MapPin, CreditCard, QrCode, Loader2 } from 'lucide-react';
+import { CheckCircle, User, Mail, Phone, MapPin, CreditCard, QrCode, Loader2, Banknote } from 'lucide-react';
 import { useCourses, Course } from '@/hooks/useCourses';
 import { useBrazilStates, useBrazilCities, State as BrazilState, City as BrazilCity } from '@/hooks/useBrazilStatesCities';
 import axios from 'axios';
@@ -33,7 +33,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
     address: '',
     neighborhood: '',
     number: '',
-    courses: [] as { id: number; time: number }[],
+    courses: [] as { id: string; time: string }[],
     value: 0,
     signature: '',
     billingType: 'PIX'
@@ -55,9 +55,9 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
   // Fetch all states from IBGE
   const { data: states = [], isLoading: statesLoading, error: statesError } = useBrazilStates();
   const { data: poles = [], isLoading: polesLoading, error: polesError } = usePoles();
-  // useEffect(() => {
-  //   console.log(poles)
-  // }, [activeCourses])
+  useEffect(() => {
+    console.log(activeCourses)
+  }, [activeCourses])
   // Fetch cities for selected state
   const { data: cities = [], isLoading: citiesLoading, error: citiesError } = useBrazilCities(formData.state);
 
@@ -93,13 +93,13 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
   };
 
   const handleCourseChange = (courseId: string, checked: boolean) => {
-    const course = courses.find(c => Number(c.id) === Number(courseId));
-    const defaultTime = course?.additionalCourse ? 30 : 0;
+    const course = courses.find(c => String(c.id) === String(courseId));
+    const defaultTime = course?.additionalCourse ? '30h' : '0';
 
     setFormData(prev => {
       let newCourseIds = checked
-        ? [...prev.courses, { id: Number(courseId), time: defaultTime }]
-        : prev.courses.filter(obj => obj.id !== Number(courseId));
+        ? [...prev.courses, { id: String(courseId), time: String(defaultTime) }]
+        : prev.courses.filter(obj => String(obj.id) !== String(courseId));
       return {
         ...prev,
         courses: newCourseIds
@@ -237,9 +237,9 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
 
   const getTotalPrice = () => {
     return formData.courses.reduce((total, obj) => {
-      const course = courses.find(c => Number(c.id) === Number(obj.id));
+      const course = courses.find(c => String(c.id) === String(obj.id));
       // console.log(activeCourses)
-      return total + (course?.price || 0);
+      return Number(total) + (Number(course?.pricePix) || 0);
     }, 0);
   };
 
@@ -306,7 +306,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="phone">CPF/CNPJ *</Label>
+                      <Label htmlFor="phone">CPF *</Label>
                       <Input
                         id="cpfCnpj"
                         name="cpfCnpj"
@@ -473,12 +473,12 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                     {activeCourses.map((course, idx) => (
                       <div
                         key={course.id}
-                        className={`flex flex-col md:flex-row items-center md:items-center p-4 border rounded-lg transition-all duration-200 min-h-[220px] md:min-h-[180px] h-full ${formData.courses.some(obj => obj.id === Number(course.id))
+                        className={`flex flex-col md:flex-row items-center md:items-center p-4 border rounded-lg transition-all duration-200 min-h-[220px] md:min-h-[180px] h-full ${formData.courses.some(obj => obj.id === String(course.id))
                           ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
                           : 'border-gray-200 hover:border-gray-300 hover:bg-gray-400/10'
                           }`}
                         onClick={() =>
-                          handleCourseChange(course.id, !formData.courses.some(obj => Number(obj.id) === Number(course.id)))
+                          handleCourseChange(course.id, !formData.courses.some(obj => String(obj.id) === String(course.id)))
                         }
                         style={{ minHeight: 220, height: "100%", cursor: "pointer" }}
                       >
@@ -506,12 +506,12 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                             <div className="flex justify-between items-center mt-2 flex-wrap gap-2">
                               <span className="text-sm text-gray-500">{course.duration}</span>
                               <span className="font-bold text-orange-600">
-                                R$ {course.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                R$ {course.pricePix?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                               </span>
                             </div>
 
                             {/* Two side-by-side radio options at the bottom of the card */}
-                            {course?.additionalCourse && formData.courses.some(obj => obj.id === Number(course.id)) && (
+                            {course?.additionalCourse && formData.courses.some(obj => obj.id === String(course.id)) && (
                               <div className="flex gap-1 pt-5 text-gray-600">
                                 <label className="flex items-center gap-0.5 text-xs" onClick={e => e.stopPropagation()}
                                 >
@@ -519,23 +519,22 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                                     className='cursor-pointer'
                                     type="radio"
                                     name={`courseOption-${course.id}`}
-                                    value="30"
+                                    value="30h"
                                     checked={
-                                      formData.courses.find(obj => obj.id === Number(course.id))?.time === 30 ||
-                                      formData.courses.find(obj => obj.id === Number(course.id))?.time === 0
+                                      formData.courses.find(obj => String(obj.id) === String(course.id))?.time === '30h' ||
+                                      formData.courses.find(obj => String(obj.id) === String(course.id))?.time === '0'
                                     }
                                     defaultChecked={formData.courses.find(obj =>
-                                      obj.id === Number(course.id))?.time === 0}
+                                      obj.id === String(course.id))?.time === '0'}
                                     onClick={e => e.stopPropagation()}
                                     onChange={e => {
                                       const value = e.target.value
                                       setFormData(prev => ({
                                         ...prev,
                                         courses: prev.courses.map(obj =>
-                                          obj.id === Number(course.id)
-                                            ? { ...obj, time: Number(value) }
+                                          String(obj.id) === String(course.id)
+                                            ? { ...obj, time: String(value) }
                                             : obj)
-
                                       }));
                                     }}
                                   />
@@ -546,17 +545,17 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                                     className='cursor-pointer'
                                     type="radio"
                                     name={`courseOption-${course.id}`}
-                                    value="60"
+                                    value="60h"
                                     checked={formData.courses.find(obj =>
-                                      obj.id === Number(course.id))?.time === 60}
+                                      obj.id === String(course.id))?.time === '60h'}
                                     onClick={e => e.stopPropagation()}
                                     onChange={e => {
                                       const value = e.target.value
                                       setFormData(prev => ({
                                         ...prev,
                                         courses: prev.courses.map(obj =>
-                                          obj.id === Number(course.id)
-                                            ? { ...obj, time: Number(value) }
+                                          String(obj.id) === String(course.id)
+                                            ? { ...obj, time: String(value) }
                                             : obj)
                                       }));
                                       console.log(formData)
@@ -616,11 +615,18 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                       PIX - R$ {getTotalPrice().toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 mb-3">
                     <RadioGroupItem value="BOLETO" id="BOLETO" />
                     <Label htmlFor="pix" className="flex items-center gap-2 cursor-pointer">
-                      <CreditCard className="h-4 w-4" />
+                      <Banknote className="h-4 w-4" />
                       Boleto - R$ {getTotalPrice().toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="CARTAO" id="CARTAO" />
+                    <Label htmlFor="pix" className="flex items-center gap-2 cursor-pointer">
+                      <CreditCard className="h-4 w-4" />
+                      Cartão - R$ {getTotalPrice().toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </Label>
                   </div>
                 </RadioGroup>

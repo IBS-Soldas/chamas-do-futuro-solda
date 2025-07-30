@@ -11,6 +11,9 @@ export interface Course {
     createdAt?: Date;
     updatedAt?: Date;
     additionalCourse?: boolean; // Added to fix EnrollmentForm usage
+    pricePix?: Number;
+    priceBoleto?: Number;
+    priceCartao?: Number;
 }
 
 export const useCourses = () => {
