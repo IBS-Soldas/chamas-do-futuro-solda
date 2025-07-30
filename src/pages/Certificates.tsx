@@ -9,7 +9,7 @@ const Certificates = () => {
   const completedLessons = 8;
   const totalLessons = 12;
   const progressPercentage = (completedLessons / totalLessons) * 100;
-  const canGetCertificate = completedLessons === totalLessons;
+  const canGetCertificate = completedLessons >= totalLessons;
 
   const certificates = [
     {
