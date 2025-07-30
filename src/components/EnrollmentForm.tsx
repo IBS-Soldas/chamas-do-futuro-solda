@@ -39,7 +39,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
     billingType: 'PIX'
   });
 
-  const [paymentMethod, setPaymentMethod] = useState<'PIX' | 'BOLETO'>('PIX');
+  const [paymentMethod, setPaymentMethod] = useState<'PIX' | 'BOLETO' | 'CARTAO'>('PIX');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [signatureRef, setSignatureRef] = useState<{ getSignatureAsBase64: () => string | null } | null>(null);
@@ -55,9 +55,9 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
   // Fetch all states from IBGE
   const { data: states = [], isLoading: statesLoading, error: statesError } = useBrazilStates();
   const { data: poles = [], isLoading: polesLoading, error: polesError } = usePoles();
-  useEffect(() => {
-    console.log(activeCourses)
-  }, [activeCourses])
+  // useEffect(() => {
+  //   console.log(activeCourses)
+  // }, [activeCourses])
   // Fetch cities for selected state
   const { data: cities = [], isLoading: citiesLoading, error: citiesError } = useBrazilCities(formData.state);
 
@@ -201,7 +201,8 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
       console.log(error)
       toast({
         title: "Erro ao enviar inscrição",
-        description: (error as Error).message,
+        // description: (error as Error).message,
+        description: error.response.data.detalhes.errors[0].description,
         variant: "destructive"
       });
     } finally {
@@ -238,8 +239,18 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
   const getTotalPrice = () => {
     return formData.courses.reduce((total, obj) => {
       const course = courses.find(c => String(c.id) === String(obj.id));
-      // console.log(activeCourses)
-      return Number(total) + (Number(course?.pricePix) || 0);
+      if (!course) return total;
+
+      let price = 0;
+      if (formData.billingType === 'PIX') {
+        price = Number(course?.pricePix);
+      } else if (formData.billingType === 'BOLETO') {
+        price = Number(course?.priceBoleto);
+      } else if (formData.billingType === 'CARTAO') {
+        price = Number(course?.priceCartao);
+      }
+
+      return total + (price || 0);
     }, 0);
   };
 
@@ -506,7 +517,12 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                             <div className="flex justify-between items-center mt-2 flex-wrap gap-2">
                               <span className="text-sm text-gray-500">{course.duration}</span>
                               <span className="font-bold text-orange-600">
-                                R$ {course.pricePix?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                R$ {(formData.billingType === 'PIX'
+                                  ? course.pricePix
+                                  : formData.billingType === 'BOLETO'
+                                  ? course.priceBoleto
+                                  : course.priceCartao
+                                )?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                               </span>
                             </div>
 
@@ -600,7 +616,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
               <CardContent>
                 <RadioGroup
                   value={formData.billingType}
-                  onValueChange={(value: 'PIX' | 'BOLETO') => {
+                  onValueChange={(value: 'PIX' | 'BOLETO' | 'CARTAO') => {
                     setFormData(prev => ({
                       ...prev,
                       billingType: value
@@ -610,23 +626,32 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                   required>
                   <div className="flex items-center space-x-2 mb-3">
                     <RadioGroupItem value="PIX" id="PIX" />
-                    <Label htmlFor="pix" className="flex items-center gap-2 cursor-pointer">
+                    <Label htmlFor="PIX" className="flex items-center gap-2 cursor-pointer">
                       <QrCode className="h-4 w-4" />
-                      PIX - R$ {getTotalPrice().toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      PIX - R$ {formData.courses.reduce((total, obj) => {
+                        const course = courses.find(c => String(c.id) === String(obj.id));
+                        return total + (Number(course?.pricePix) || 0);
+                      }, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2 mb-3">
                     <RadioGroupItem value="BOLETO" id="BOLETO" />
-                    <Label htmlFor="pix" className="flex items-center gap-2 cursor-pointer">
+                    <Label htmlFor="BOLETO" className="flex items-center gap-2 cursor-pointer">
                       <Banknote className="h-4 w-4" />
-                      Boleto - R$ {getTotalPrice().toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      Boleto - R$ {formData.courses.reduce((total, obj) => {
+                        const course = courses.find(c => String(c.id) === String(obj.id));
+                        return total + (Number(course?.priceBoleto) || 0);
+                      }, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="CARTAO" id="CARTAO" />
-                    <Label htmlFor="pix" className="flex items-center gap-2 cursor-pointer">
+                    <Label htmlFor="CARTAO" className="flex items-center gap-2 cursor-pointer">
                       <CreditCard className="h-4 w-4" />
-                      Cartão - R$ {getTotalPrice().toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      Cartão - R$ {formData.courses.reduce((total, obj) => {
+                        const course = courses.find(c => String(c.id) === String(obj.id));
+                        return total + (Number(course?.priceCartao) || 0);
+                      }, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </Label>
                   </div>
                 </RadioGroup>
@@ -789,10 +814,10 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
             <div className="flex gap-3">
               <Button
                 // onClick={handlePaymentConfirmation}
-                onClick={() => {
-                  setShowPaymentModal(false)
-                  onClose()
-                }}
+                // onClick={() => {
+                //   setShowPaymentModal(false)
+                //   onClose()
+                // }}
                 disabled={isSubmitting}
                 className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
               >
