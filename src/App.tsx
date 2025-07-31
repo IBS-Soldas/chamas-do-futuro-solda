@@ -10,7 +10,8 @@ import About from "./pages/About";
 import Login from "./pages/Login";
 import DashboardLayout from "./components/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
-import Lessons from "./pages/Lessons";
+import Courses from "./pages/Courses";
+import CourseLessons from "./pages/CourseLessons";
 import Materials from "./pages/Materials";
 import Certificates from "./pages/Certificates";
 import NotFound from "./pages/NotFound";
@@ -38,7 +39,8 @@ const App = () => (
               }
             >
               <Route index element={<Dashboard />} />
-              <Route path="aulas" element={<Lessons />} />
+              <Route path="cursos" element={<Courses />} />
+              <Route path="cursos/:courseId/aulas" element={<CourseLessons />} />
               <Route path="apostilas" element={<Materials />} />
               <Route path="certificados" element={<Certificates />} />
             </Route>

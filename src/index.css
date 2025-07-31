@@ -222,3 +222,26 @@ html {
   transform: scale(1.02);
   filter: brightness(1.1) contrast(1.1);
 }
+
+/* Estilos para os cards de cursos */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Efeito de hover para cards de cursos */
+.course-card-hover {
+  transition: all 0.3s ease;
+}
+
+.course-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Progress bar customizada */
+.progress-custom {
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+}
