@@ -36,7 +36,9 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
     courses: [] as { id: string; time: string }[],
     value: 0,
     signature: '',
-    billingType: 'PIX'
+    billingType: 'PIX',
+    installments: 1,
+    dueDate: ''
   });
 
   const [paymentMethod, setPaymentMethod] = useState<'PIX' | 'BOLETO' | 'CARTAO'>('PIX');
@@ -55,9 +57,9 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
   // Fetch all states from IBGE
   const { data: states = [], isLoading: statesLoading, error: statesError } = useBrazilStates();
   const { data: poles = [], isLoading: polesLoading, error: polesError } = usePoles();
-    // useEffect(() => {
-    //   console.log(activeCourses)
-    // }, [activeCourses])
+  // useEffect(() => {
+  //   console.log(activeCourses)
+  // }, [activeCourses])
   // Fetch cities for selected state
   const { data: cities = [], isLoading: citiesLoading, error: citiesError } = useBrazilCities(formData.state);
 
@@ -128,7 +130,11 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
       value: total
     }));
     // console.log(formData)
-  }, [formData.courses]);
+  }, [formData.courses, formData.billingType]);
+
+  // useEffect(() => {
+  //   console.log(formData)
+  // }, [formData.installments])
 
   function formatPhone(value: string) {
     // Remove all non-digit characters
@@ -255,7 +261,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
       } else if (formData.billingType === 'CARTAO') {
         price = Number(course?.priceCartao);
       }
-
+      // console.log(formData)
       return total + (price || 0);
     }, 0);
   };
@@ -553,7 +559,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                                         type="radio"
                                         name={`courseOption-${course.id}`}
                                         value={optionCourse.time}
-                                        checked={formData.courses.find(obj => obj.id === String(course.id))?.time === optionCourse.time}                                        onClick={e => e.stopPropagation()}
+                                        checked={formData.courses.find(obj => obj.id === String(course.id))?.time === optionCourse.time} onClick={e => e.stopPropagation()}
                                         onChange={e => {
                                           const value = e.target.value
                                           setFormData(prev => ({
@@ -606,14 +612,29 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                 <RadioGroup
                   value={formData.billingType}
                   onValueChange={(value: 'PIX' | 'BOLETO' | 'CARTAO') => {
-                    setFormData(prev => ({
-                      ...prev,
-                      billingType: value
-                    }));
+                    setFormData(prev => {
+                      // Calculate new due date if "BOLETO" is selected
+                      let dueDate = prev.dueDate;
+                      if (value === 'BOLETO') {
+                        const date = new Date();
+                        date.setDate(date.getDate() + 7);
+                        // Format as dd/mm/yyyy
+                        dueDate = date.toLocaleDateString('pt-BR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric'
+                        });
+                      }
+                      return {
+                        ...prev,
+                        billingType: value,
+                        dueDate
+                      };
+                    });
                     setPaymentMethod(value);
                   }}
                   required>
-                  <div className="flex items-center space-x-2 mb-3">
+                  <div className="flex items-center space-x-2 mb-5">
                     <RadioGroupItem value="PIX" id="PIX" />
                     <Label htmlFor="PIX" className="flex items-center gap-2 cursor-pointer">
                       <QrCode className="h-4 w-4" />
@@ -623,15 +644,43 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                       }, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-2 mb-3">
-                    <RadioGroupItem value="BOLETO" id="BOLETO" />
-                    <Label htmlFor="BOLETO" className="flex items-center gap-2 cursor-pointer">
-                      <Banknote className="h-4 w-4" />
-                      Boleto - R$ {formData.courses.reduce((total, obj) => {
-                        const course = courses.find(c => String(c.id) === String(obj.id));
-                        return total + (Number(course?.priceBoleto) || 0);
-                      }, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </Label>
+                  <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 mb-5">
+                      <RadioGroupItem value="BOLETO" id="BOLETO" />
+                      <Label htmlFor="BOLETO" className="flex items-center gap-2 cursor-pointer">
+                        <Banknote className="h-4 w-4" />
+                        Boleto - R$ {formData.courses.reduce((total, obj) => {
+                          const course = courses.find(c => String(c.id) === String(obj.id));
+                          return total + (Number(course?.priceBoleto) || 0);
+                        }, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </Label>
+                    </div>
+                    {formData.billingType === 'BOLETO' && (
+                      <div className="mb-3 flex items-center mb-5 gap-2">
+                        <Label htmlFor="installments">Parcelamento:</Label>
+                        <Select
+                          id="installments"
+                          value={String(formData.installments)}
+                          onValueChange={val =>
+                            setFormData(prev => ({
+                              ...prev,
+                              installments: Number(val)
+                            }))
+                          }
+                        >
+                          <SelectTrigger className="w-24">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {[1, 2, 3, 4, 5].map(num => (
+                              <SelectItem key={num} value={String(num)}>
+                                {num}x
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="CARTAO" id="CARTAO" />
