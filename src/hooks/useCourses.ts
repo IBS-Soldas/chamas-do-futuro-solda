@@ -5,7 +5,7 @@ export interface Course {
     id: string;
     name: string;
     price: number;
-    duration: string;
+    time: string;
     description: string;
     isActive?: boolean;
     createdAt?: Date;

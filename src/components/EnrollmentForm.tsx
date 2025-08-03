@@ -55,9 +55,9 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
   // Fetch all states from IBGE
   const { data: states = [], isLoading: statesLoading, error: statesError } = useBrazilStates();
   const { data: poles = [], isLoading: polesLoading, error: polesError } = usePoles();
-  // useEffect(() => {
-  //   console.log(activeCourses)
-  // }, [activeCourses])
+    // useEffect(() => {
+    //   console.log(activeCourses)
+    // }, [activeCourses])
   // Fetch cities for selected state
   const { data: cities = [], isLoading: citiesLoading, error: citiesError } = useBrazilCities(formData.state);
 
@@ -94,7 +94,13 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
 
   const handleCourseChange = (courseId: string, checked: boolean) => {
     const course = courses.find(c => String(c.id) === String(courseId));
-    const defaultTime = course?.additionalCourse ? '30h' : '0';
+    let defaultTime = String(course?.time ?? '0');
+    if (course?.additionalCourse) {
+      const firstInactiveCourse = courses.find(c => !c.isActive);
+      if (firstInactiveCourse) {
+        defaultTime = String(firstInactiveCourse.time);
+      }
+    }
 
     setFormData(prev => {
       let newCourseIds = checked
@@ -515,70 +521,53 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                             </Label>
                             <p className="text-sm text-gray-600 mt-1">{course.description}</p>
                             <div className="flex justify-between items-center mt-2 flex-wrap gap-2">
-                              <span className="text-sm text-gray-500">{course.duration}</span>
+                              <span className="text-sm text-gray-500">{course.time}</span>
                               <span className="font-bold text-orange-600">
                                 R$ {(formData.billingType === 'PIX'
                                   ? course.pricePix
                                   : formData.billingType === 'BOLETO'
-                                  ? course.priceBoleto
-                                  : course.priceCartao
+                                    ? course.priceBoleto
+                                    : course.priceCartao
                                 )?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                               </span>
                             </div>
 
                             {/* Two side-by-side radio options at the bottom of the card */}
                             {course?.additionalCourse && formData.courses.some(obj => obj.id === String(course.id)) && (
-                              <div className="flex gap-1 pt-5 text-gray-600">
-                                <label className="flex items-center gap-0.5 text-xs" onClick={e => e.stopPropagation()}
-                                >
-                                  <input
-                                    className='cursor-pointer'
-                                    type="radio"
-                                    name={`courseOption-${course.id}`}
-                                    value="30h"
-                                    checked={
-                                      formData.courses.find(obj => String(obj.id) === String(course.id))?.time === '30h' ||
-                                      formData.courses.find(obj => String(obj.id) === String(course.id))?.time === '0'
-                                    }
-                                    defaultChecked={formData.courses.find(obj =>
-                                      obj.id === String(course.id))?.time === '0'}
-                                    onClick={e => e.stopPropagation()}
-                                    onChange={e => {
-                                      const value = e.target.value
-                                      setFormData(prev => ({
-                                        ...prev,
-                                        courses: prev.courses.map(obj =>
-                                          String(obj.id) === String(course.id)
-                                            ? { ...obj, time: String(value) }
-                                            : obj)
-                                      }));
-                                    }}
-                                  />
-                                  Chaparia 30h
-                                </label>
-                                <label className="flex items-center gap-0.5 text-xs" onClick={e => e.stopPropagation()}>
-                                  <input
-                                    className='cursor-pointer'
-                                    type="radio"
-                                    name={`courseOption-${course.id}`}
-                                    value="60h"
-                                    checked={formData.courses.find(obj =>
-                                      obj.id === String(course.id))?.time === '60h'}
-                                    onClick={e => e.stopPropagation()}
-                                    onChange={e => {
-                                      const value = e.target.value
-                                      setFormData(prev => ({
-                                        ...prev,
-                                        courses: prev.courses.map(obj =>
-                                          String(obj.id) === String(course.id)
-                                            ? { ...obj, time: String(value) }
-                                            : obj)
-                                      }));
-                                      console.log(formData)
-                                    }}
-                                  />
-                                  Tubulação 60h
-                                </label>
+                              <div className="flex flex-col md:flex-row gap-2 pt-5 text-gray-600">
+                                {courses
+                                  .filter(optionCourse => optionCourse.isActive === false)
+                                  .map(optionCourse => (
+                                    <label
+                                      key={optionCourse.id}
+                                      className={`flex items-center gap-1 text-xs px-2 py-1 rounded 
+                                        ${optionCourse.isActive ? 'bg-gray-200 text-gray-500 line-through cursor-not-allowed' : 'cursor-pointer'}
+                                      `}
+                                      onClick={e => {
+                                        if (!optionCourse.isActive) e.preventDefault();
+                                        e.stopPropagation();
+                                      }}
+                                    >
+                                      <input
+                                        className='cursor-pointer'
+                                        type="radio"
+                                        name={`courseOption-${course.id}`}
+                                        value={optionCourse.time}
+                                        checked={formData.courses.find(obj => obj.id === String(course.id))?.time === optionCourse.time}                                        onClick={e => e.stopPropagation()}
+                                        onChange={e => {
+                                          const value = e.target.value
+                                          setFormData(prev => ({
+                                            ...prev,
+                                            courses: prev.courses.map(obj =>
+                                              String(obj.id) === String(course.id)
+                                                ? { ...obj, time: String(value) }
+                                                : obj)
+                                          }));
+                                        }}
+                                      />
+                                      {optionCourse.name} {optionCourse.time}
+                                    </label>
+                                  ))}
                               </div>
                             )}
 
