@@ -36,7 +36,9 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
     courses: [] as { id: string; time: string }[],
     value: 0,
     signature: '',
-    billingType: 'PIX'
+    billingType: 'PIX',
+    installments: 1,
+    dueDate: ''
   });
 
   const [paymentMethod, setPaymentMethod] = useState<'PIX' | 'BOLETO' | 'CARTAO'>('PIX');
@@ -94,7 +96,13 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
 
   const handleCourseChange = (courseId: string, checked: boolean) => {
     const course = courses.find(c => String(c.id) === String(courseId));
-    const defaultTime = course?.additionalCourse ? '30h' : '0';
+    let defaultTime = String(course?.time ?? '0');
+    if (course?.additionalCourse) {
+      const firstInactiveCourse = courses.find(c => !c.isActive);
+      if (firstInactiveCourse) {
+        defaultTime = String(firstInactiveCourse.time);
+      }
+    }
 
     setFormData(prev => {
       let newCourseIds = checked
@@ -122,7 +130,11 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
       value: total
     }));
     // console.log(formData)
-  }, [formData.courses]);
+  }, [formData.courses, formData.billingType]);
+
+  // useEffect(() => {
+  //   console.log(formData)
+  // }, [formData.installments])
 
   function formatPhone(value: string) {
     // Remove all non-digit characters
@@ -249,7 +261,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
       } else if (formData.billingType === 'CARTAO') {
         price = Number(course?.priceCartao);
       }
-
+      // console.log(formData)
       return total + (price || 0);
     }, 0);
   };
@@ -515,70 +527,53 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                             </Label>
                             <p className="text-sm text-gray-600 mt-1">{course.description}</p>
                             <div className="flex justify-between items-center mt-2 flex-wrap gap-2">
-                              <span className="text-sm text-gray-500">{course.duration}</span>
+                              <span className="text-sm text-gray-500">{course.time}</span>
                               <span className="font-bold text-orange-600">
                                 R$ {(formData.billingType === 'PIX'
                                   ? course.pricePix
                                   : formData.billingType === 'BOLETO'
-                                  ? course.priceBoleto
-                                  : course.priceCartao
+                                    ? course.priceBoleto
+                                    : course.priceCartao
                                 )?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                               </span>
                             </div>
 
                             {/* Two side-by-side radio options at the bottom of the card */}
                             {course?.additionalCourse && formData.courses.some(obj => obj.id === String(course.id)) && (
-                              <div className="flex gap-1 pt-5 text-gray-600">
-                                <label className="flex items-center gap-0.5 text-xs" onClick={e => e.stopPropagation()}
-                                >
-                                  <input
-                                    className='cursor-pointer'
-                                    type="radio"
-                                    name={`courseOption-${course.id}`}
-                                    value="30h"
-                                    checked={
-                                      formData.courses.find(obj => String(obj.id) === String(course.id))?.time === '30h' ||
-                                      formData.courses.find(obj => String(obj.id) === String(course.id))?.time === '0'
-                                    }
-                                    defaultChecked={formData.courses.find(obj =>
-                                      obj.id === String(course.id))?.time === '0'}
-                                    onClick={e => e.stopPropagation()}
-                                    onChange={e => {
-                                      const value = e.target.value
-                                      setFormData(prev => ({
-                                        ...prev,
-                                        courses: prev.courses.map(obj =>
-                                          String(obj.id) === String(course.id)
-                                            ? { ...obj, time: String(value) }
-                                            : obj)
-                                      }));
-                                    }}
-                                  />
-                                  Chaparia 30h
-                                </label>
-                                <label className="flex items-center gap-0.5 text-xs" onClick={e => e.stopPropagation()}>
-                                  <input
-                                    className='cursor-pointer'
-                                    type="radio"
-                                    name={`courseOption-${course.id}`}
-                                    value="60h"
-                                    checked={formData.courses.find(obj =>
-                                      obj.id === String(course.id))?.time === '60h'}
-                                    onClick={e => e.stopPropagation()}
-                                    onChange={e => {
-                                      const value = e.target.value
-                                      setFormData(prev => ({
-                                        ...prev,
-                                        courses: prev.courses.map(obj =>
-                                          String(obj.id) === String(course.id)
-                                            ? { ...obj, time: String(value) }
-                                            : obj)
-                                      }));
-                                      console.log(formData)
-                                    }}
-                                  />
-                                  Tubulação 60h
-                                </label>
+                              <div className="flex flex-col md:flex-row gap-2 pt-5 text-gray-600">
+                                {courses
+                                  .filter(optionCourse => optionCourse.isActive === false)
+                                  .map(optionCourse => (
+                                    <label
+                                      key={optionCourse.id}
+                                      className={`flex items-center gap-1 text-xs px-2 py-1 rounded 
+                                        ${optionCourse.isActive ? 'bg-gray-200 text-gray-500 line-through cursor-not-allowed' : 'cursor-pointer'}
+                                      `}
+                                      onClick={e => {
+                                        if (!optionCourse.isActive) e.preventDefault();
+                                        e.stopPropagation();
+                                      }}
+                                    >
+                                      <input
+                                        className='cursor-pointer'
+                                        type="radio"
+                                        name={`courseOption-${course.id}`}
+                                        value={optionCourse.time}
+                                        checked={formData.courses.find(obj => obj.id === String(course.id))?.time === optionCourse.time} onClick={e => e.stopPropagation()}
+                                        onChange={e => {
+                                          const value = e.target.value
+                                          setFormData(prev => ({
+                                            ...prev,
+                                            courses: prev.courses.map(obj =>
+                                              String(obj.id) === String(course.id)
+                                                ? { ...obj, time: String(value) }
+                                                : obj)
+                                          }));
+                                        }}
+                                      />
+                                      {optionCourse.name} {optionCourse.time}
+                                    </label>
+                                  ))}
                               </div>
                             )}
 
@@ -617,14 +612,29 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                 <RadioGroup
                   value={formData.billingType}
                   onValueChange={(value: 'PIX' | 'BOLETO' | 'CARTAO') => {
-                    setFormData(prev => ({
-                      ...prev,
-                      billingType: value
-                    }));
+                    setFormData(prev => {
+                      // Calculate new due date if "BOLETO" is selected
+                      let dueDate = prev.dueDate;
+                      if (value === 'BOLETO') {
+                        const date = new Date();
+                        date.setDate(date.getDate() + 7);
+                        // Format as dd/mm/yyyy
+                        dueDate = date.toLocaleDateString('pt-BR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric'
+                        });
+                      }
+                      return {
+                        ...prev,
+                        billingType: value,
+                        dueDate
+                      };
+                    });
                     setPaymentMethod(value);
                   }}
                   required>
-                  <div className="flex items-center space-x-2 mb-3">
+                  <div className="flex items-center space-x-2 mb-5">
                     <RadioGroupItem value="PIX" id="PIX" />
                     <Label htmlFor="PIX" className="flex items-center gap-2 cursor-pointer">
                       <QrCode className="h-4 w-4" />
@@ -634,15 +644,43 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                       }, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-2 mb-3">
-                    <RadioGroupItem value="BOLETO" id="BOLETO" />
-                    <Label htmlFor="BOLETO" className="flex items-center gap-2 cursor-pointer">
-                      <Banknote className="h-4 w-4" />
-                      Boleto - R$ {formData.courses.reduce((total, obj) => {
-                        const course = courses.find(c => String(c.id) === String(obj.id));
-                        return total + (Number(course?.priceBoleto) || 0);
-                      }, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </Label>
+                  <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 mb-5">
+                      <RadioGroupItem value="BOLETO" id="BOLETO" />
+                      <Label htmlFor="BOLETO" className="flex items-center gap-2 cursor-pointer">
+                        <Banknote className="h-4 w-4" />
+                        Boleto - R$ {formData.courses.reduce((total, obj) => {
+                          const course = courses.find(c => String(c.id) === String(obj.id));
+                          return total + (Number(course?.priceBoleto) || 0);
+                        }, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </Label>
+                    </div>
+                    {formData.billingType === 'BOLETO' && (
+                      <div className="mb-3 flex items-center mb-5 gap-2">
+                        <Label htmlFor="installments">Parcelamento:</Label>
+                        <Select
+                          id="installments"
+                          value={String(formData.installments)}
+                          onValueChange={val =>
+                            setFormData(prev => ({
+                              ...prev,
+                              installments: Number(val)
+                            }))
+                          }
+                        >
+                          <SelectTrigger className="w-24">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {[1, 2, 3, 4, 5].map(num => (
+                              <SelectItem key={num} value={String(num)}>
+                                {num}x
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="CARTAO" id="CARTAO" />
