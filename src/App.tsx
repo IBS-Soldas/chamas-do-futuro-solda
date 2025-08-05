@@ -16,39 +16,49 @@ import Materials from "./pages/Materials";
 import Certificates from "./pages/Certificates";
 import NotFound from "./pages/NotFound";
 import { PrivateRoute } from "./components/PrivateRoute";
+import { useFirebase } from "./contexts/FirebaseContext";
 
 const queryClient = new QueryClient();
+
+const AppContent = () => {
+  const { loading } = useFirebase();
+
+  if (loading) return null; // or <Spinner />
+
+  return (
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/sobre" element={<About />} />
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <DashboardLayout />
+              </PrivateRoute>
+            }
+          >
+            <Route index element={<Dashboard />} />
+            <Route path="cursos" element={<Courses />} />
+            <Route path="cursos/:courseId/aulas" element={<CourseLessons />} />
+            <Route path="apostilas" element={<Materials />} />
+            <Route path="certificados" element={<Certificates />} />
+          </Route>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <FirebaseProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/sobre" element={<About />} />
-            <Route path="/login" element={<Login />} />
-            <Route
-              path="/dashboard"
-              element={
-                <PrivateRoute>
-                  <DashboardLayout />
-                </PrivateRoute>
-              }
-            >
-              <Route index element={<Dashboard />} />
-              <Route path="cursos" element={<Courses />} />
-              <Route path="cursos/:courseId/aulas" element={<CourseLessons />} />
-              <Route path="apostilas" element={<Materials />} />
-              <Route path="certificados" element={<Certificates />} />
-            </Route>
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <AppContent />
     </FirebaseProvider>
   </QueryClientProvider>
 );

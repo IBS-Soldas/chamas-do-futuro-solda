@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, onAuthStateChanged } from 'firebase/auth';
+import { User, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { auth, db, storage } from '@/lib/firebase';
 
 interface FirebaseContextType {
@@ -29,12 +29,28 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({ children }) 
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user);
-            setLoading(false);
-        });
+        let unsubscribe: () => void;
 
-        return () => unsubscribe();
+        const initAuth = async () => {
+            try {
+                await setPersistence(auth, browserLocalPersistence);
+                unsubscribe = onAuthStateChanged(auth, (user) => {
+                    setUser(user);
+                    setLoading(false);
+                });
+            } catch (error) {
+                console.error('Failed to set auth persistence:', error);
+                setLoading(false);
+            }
+        };
+
+        initAuth();
+
+        return () => {
+            if (unsubscribe) {
+                unsubscribe();
+            }
+        };
     }, []);
 
     const value = {
@@ -50,4 +66,4 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({ children }) 
             {children}
         </FirebaseContext.Provider>
     );
-}; 
+};
