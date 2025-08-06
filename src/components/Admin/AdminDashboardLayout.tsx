@@ -1,14 +1,13 @@
-
 import React from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { StudentSidebar } from './StudentSidebar';
+import { AdminSidebar } from './AdminSidebar';
 
 const AdminDashboardLayout = () => {
     return (
         <SidebarProvider>
             <div className="min-h-screen flex w-full bg-slate-900">
-                <StudentSidebar />
+                <AdminSidebar />
 
                 <div className="flex-1 flex flex-col">
                     <header className="h-16 bg-slate-800 border-b border-orange-500/20 flex items-center px-6">

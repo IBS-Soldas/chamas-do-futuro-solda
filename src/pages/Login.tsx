@@ -38,7 +38,7 @@ const Login = () => {
       });
       console.log(user)
       if (user.accessLevel === 1) {
-        navigate('/dashboard');
+        navigate('/dashboard-student');
       } else if (user.accessLevel === 3) {
         navigate('/dashboard-admin');
       } else {

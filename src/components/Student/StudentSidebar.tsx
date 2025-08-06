@@ -27,10 +27,10 @@ import {
 import { Button } from "@/components/ui/button";
 
 const menuItems = [
-  { title: "Dashboard", url: "/dashboard", icon: Home },
-  { title: "Cursos", url: "/dashboard/cursos", icon: BookOpen },
-  { title: "Apostilas", url: "/dashboard/apostilas", icon: FileText },
-  { title: "Certificados", url: "/dashboard/certificados", icon: Award },
+  { title: "Dashboard", url: "/dashboard-student", icon: Home },
+  { title: "Cursos", url: "/dashboard-student/cursos", icon: BookOpen },
+  { title: "Apostilas", url: "/dashboard-student/apostilas", icon: FileText },
+  { title: "Certificados", url: "/dashboard-student/certificados", icon: Award },
 ];
 
 export function StudentSidebar() {
