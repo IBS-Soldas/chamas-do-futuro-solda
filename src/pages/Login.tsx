@@ -28,7 +28,7 @@ const Login = () => {
     if (loading) return;
 
     try {
-      await signIn(email, password);
+      const user = await signIn(email, password);
       console.log('Login successful');
       toast({
         title: 'Login realizado com sucesso',
@@ -36,8 +36,15 @@ const Login = () => {
         variant: 'default',
         duration: 2000,
       });
-      navigate('/dashboard')
-      ;
+      console.log(user)
+      if (user.accessLevel === 1) {
+        navigate('/dashboard');
+      } else if (user.accessLevel === 3) {
+        navigate('/dashboard-admin');
+      } else {
+        navigate('/dashboard');
+      }
+
     } catch (err: any) {
       // Show toast if available, otherwise set error state
       console.log(err)

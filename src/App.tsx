@@ -17,6 +17,8 @@ import Certificates from "./pages/Certificates";
 import NotFound from "./pages/NotFound";
 import { PrivateRoute } from "./components/PrivateRoute";
 import { useFirebase } from "./contexts/FirebaseContext";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminDashboardLayout from "./components/AdminDashboardLayout";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +49,16 @@ const AppContent = () => {
             <Route path="cursos/:courseId/aulas" element={<CourseLessons />} />
             <Route path="apostilas" element={<Materials />} />
             <Route path="certificados" element={<Certificates />} />
+          </Route>
+          <Route
+            path="/dashboard-admin"
+            element={
+              <PrivateRoute>
+                <AdminDashboardLayout />
+              </PrivateRoute>
+            }
+          >
+            <Route index element={<AdminDashboard />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
