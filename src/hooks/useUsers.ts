@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { firestore, queryHelpers } from '@/lib/firestore';
+import { useApp } from '@/contexts/AppContext';
 
 export interface Users {
     accessLevel: number;
@@ -23,6 +24,8 @@ export interface Users {
 }
 
 export const useUsers = () => {
+    const { setUsers } = useApp();
+
     return useQuery({
         queryKey: ['users'],
         queryFn: async (): Promise<Users[]> => {
@@ -32,7 +35,7 @@ export const useUsers = () => {
                     // queryHelpers.where('isActive', '==', true),
                     queryHelpers.orderBy('createdAt', 'desc')
                 ]);
-
+                setUsers(users)
                 return users;
             } catch (error) {
                 console.error('Error fetching courses:', error);

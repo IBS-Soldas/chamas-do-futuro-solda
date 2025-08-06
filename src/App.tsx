@@ -20,6 +20,9 @@ import { useFirebase } from "./contexts/FirebaseContext";
 import AdminDashboard from "./pages/AdminPage/AdminDashboard";
 import AdminDashboardLayout from "./components/Admin/AdminDashboardLayout";
 import Students from "./pages/AdminPage/Students";
+import AdminCourses from "./pages/AdminPage/AdminCourses";
+import AdminCourseLessons from "./pages/AdminPage/AdminCourseLessons";
+import StudentDetails from "./pages/AdminPage/StudentDetails";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +40,8 @@ const AppContent = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/sobre" element={<About />} />
           <Route path="/login" element={<Login />} />
+          <Route path="*" element={<NotFound />} />
+
           <Route
             path="/dashboard-student"
             element={
@@ -51,6 +56,7 @@ const AppContent = () => {
             <Route path="apostilas" element={<Materials />} />
             <Route path="certificados" element={<Certificates />} />
           </Route>
+
           <Route
             path="/dashboard-admin"
             element={
@@ -61,12 +67,12 @@ const AppContent = () => {
           >
             <Route index element={<AdminDashboard />} />
             <Route path="students" element={<Students />} />
-            <Route path="cursos" element={<Courses />} />
-            <Route path="cursos/:courseId/aulas" element={<CourseLessons />} />
+            <Route path="students/:firebaseUid" element={<StudentDetails />} />
+            <Route path="cursos" element={<AdminCourses />} />
+            <Route path="cursos/:courseId/aulas" element={<AdminCourseLessons />} />
             <Route path="apostilas" element={<Materials />} />
             <Route path="certificados" element={<Certificates />} />
           </Route>
-          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
