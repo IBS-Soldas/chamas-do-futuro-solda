@@ -8,19 +8,23 @@ import {
     User
 } from 'firebase/auth';
 import { useFirebase } from '@/contexts/FirebaseContext';
+import { useUsers } from './useUsers';
 
 export const useAuth = () => {
     const { auth, user } = useFirebase();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const { data: users = [], isLoading: usersLoading, error: usersError } = useUsers();
 
     const signIn = async (email: string, password: string) => {
         setLoading(true);
         setError(null);
         try {
             const result = await signInWithEmailAndPassword(auth, email, password);
-            console.log(result)
-            return result;
+            const user = users.find(u => u.firebaseUid === result.user.uid);
+            console.log(result, user.accessLevel)
+            
+            return user;
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred');
             throw err;

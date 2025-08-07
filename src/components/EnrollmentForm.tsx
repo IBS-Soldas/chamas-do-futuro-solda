@@ -610,6 +610,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
               </CardHeader>
               <CardContent>
                 <RadioGroup
+                  className="flex flex-col gap-5 sm:gap-4"
                   value={formData.billingType}
                   onValueChange={(value: 'PIX' | 'BOLETO' | 'CARTAO') => {
                     setFormData(prev => {
@@ -618,12 +619,11 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                       if (value === 'BOLETO') {
                         const date = new Date();
                         date.setDate(date.getDate() + 7);
-                        // Format as dd/mm/yyyy
-                        dueDate = date.toLocaleDateString('pt-BR', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric'
-                        });
+                        // Format as MM-DD-YYYY
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const year = date.getFullYear();
+                        dueDate = `${year}-${month}-${day}`;
                       }
                       return {
                         ...prev,
@@ -634,7 +634,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                     setPaymentMethod(value);
                   }}
                   required>
-                  <div className="flex items-center space-x-2 mb-5">
+                  <div className="flex items-center space-x-2 mb-5 h-6">
                     <RadioGroupItem value="PIX" id="PIX" />
                     <Label htmlFor="PIX" className="flex items-center gap-2 cursor-pointer">
                       <QrCode className="h-4 w-4" />
@@ -644,7 +644,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                       }, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center h-6">
                     <div className="flex items-center space-x-2 mb-5">
                       <RadioGroupItem value="BOLETO" id="BOLETO" />
                       <Label htmlFor="BOLETO" className="flex items-center gap-2 cursor-pointer">
@@ -656,7 +656,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                       </Label>
                     </div>
                     {formData.billingType === 'BOLETO' && (
-                      <div className="mb-3 flex items-center mb-5 gap-2">
+                      <div className="mb-5 flex flex-col sm:flex-row items-start sm:items-center gap-2 ml-2">
                         <Label htmlFor="installments">Parcelamento:</Label>
                         <Select
                           id="installments"
