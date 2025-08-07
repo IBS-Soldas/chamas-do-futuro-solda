@@ -657,9 +657,8 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                     </div>
                     {formData.billingType === 'BOLETO' && (
                       <div className="mb-5 flex flex-col sm:flex-row items-start sm:items-center gap-2 ml-2">
-                        <Label htmlFor="installments">Parcelamento:</Label>
+                        <Label>Parcelamento:</Label>
                         <Select
-                          id="installments"
                           value={String(formData.installments)}
                           onValueChange={val =>
                             setFormData(prev => ({
