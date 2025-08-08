@@ -103,29 +103,29 @@ const Dashboard = () => {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card className="bg-white/5 backdrop-blur-md border-orange-500/20 hover:border-orange-500/40 transition-colors cursor-pointer">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-500/20 rounded-lg">
-                <BookOpen className="h-6 w-6 text-blue-400" />
-              </div>
-              <div>
-                <CardTitle className="text-white">Continuar Aulas</CardTitle>
-                <CardDescription className="text-gray-400">
-                  Próxima aula: Soldagem MIG
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <Button
-              onClick={() => navigate('/dashboard-student/cursos')}
-              className="w-full bg-blue-500 hover:bg-blue-600"
-            >
-              Ir para Aulas
-            </Button>
-          </CardContent>
-        </Card>
+      <Card className="bg-white/5 backdrop-blur-md border-orange-500/20 hover:border-orange-500/40 transition-colors cursor-pointer">
+  <CardHeader>
+    <div className="flex items-center gap-3">
+      <div className="p-2 bg-blue-500/20 rounded-lg">
+        <BookOpen className="h-6 w-6 text-blue-400" />
+      </div>
+      <div>
+        <CardTitle className="text-white">Continuar Cursos</CardTitle>
+        <CardDescription className="text-gray-400 ml-0.4">
+          Veja seus cursos
+        </CardDescription>
+      </div>
+    </div>
+  </CardHeader>
+  <CardContent>
+    <Button
+      onClick={() => navigate('/dashboard-student/cursos')}
+      className="w-full bg-blue-500 hover:bg-blue-600"
+    >
+      Ir para Cursos
+    </Button>
+  </CardContent>
+</Card>
 
         <Card className="bg-white/5 backdrop-blur-md border-orange-500/20 hover:border-orange-500/40 transition-colors cursor-pointer">
           <CardHeader>
