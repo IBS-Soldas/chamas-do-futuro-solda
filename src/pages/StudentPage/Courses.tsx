@@ -58,7 +58,7 @@ const Courses = () => {
     const progressData = getProgressData(course.id);
     const lastAccessedOptions = ["2 dias atrás", "1 semana atrás", "3 dias atrás", "5 dias atrás", "1 dia atrás"];
     const randomLastAccessed = lastAccessedOptions[Math.floor(Math.random() * lastAccessedOptions.length)];
-    
+
     return {
       ...course,
       ...progressData,
@@ -67,7 +67,7 @@ const Courses = () => {
   });
 
   const handleCourseClick = (courseId: number) => {
-    navigate(`/dashboard/cursos/${courseId}/aulas`);
+    navigate(`/dashboard-student/cursos/${courseId}/aulas`);
   };
 
   const getProgressColor = (progress: number) => {
@@ -96,7 +96,7 @@ const Courses = () => {
         <p className="text-gray-300 mb-4">
           Continue de onde parou e acompanhe seu progresso em cada curso.
         </p>
-        
+
         {/* Estatísticas Gerais */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
@@ -142,101 +142,101 @@ const Courses = () => {
 
       {/* Grid de Cursos */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-  {purchasedCourses.map((course) => (
-    <Card 
-      key={course.id}
-      className="flex flex-col bg-white/5 backdrop-blur-md border border-gray-500/20 hover:border-blue-500/40 transition-all duration-300 hover:scale-105 cursor-pointer group"
-      onClick={() => handleCourseClick(course.id)}
-    >
-      {/* Imagem de Capa */}
-      <div className="relative overflow-hidden rounded-t-lg">
-        <img 
-          src={course.coverImage} 
-          alt={course.title}
-          className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        
-        {/* Badge de Nível */}
-        <div className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-medium ${getLevelColor(course.level)}`}>
-          {course.level}
-        </div>
-        
-        {/* Badge de Certificado */}
-        {course.certificate && (
-          <div className="absolute top-3 left-3 p-1 bg-yellow-500/90 rounded-full">
-            <Award className="h-4 w-4 text-white" />
-          </div>
-        )}
-      </div>
-
-      {/* Conteúdo do Card */}
-      <div className="flex flex-col flex-1 justify-between">
-        <div>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-white text-lg group-hover:text-blue-400 transition-colors">
-              {course.title}
-            </CardTitle>
-            <CardDescription className="text-gray-400 text-sm line-clamp-2">
-              {course.description}
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent className="space-y-4">
-            {/* Progresso */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-400">Progresso</span>
-                <span className="text-white font-medium">{course.progress}%</span>
-              </div>
-              <Progress 
-                value={course.progress} 
-                className="h-2"
-                style={{
-                  '--progress-background': getProgressColor(course.progress)
-                } as React.CSSProperties}
-              />
-              <p className="text-gray-400 text-xs">
-                {course.completedLessons} de {course.totalLessons} aulas concluídas
-              </p>
-            </div>
-
-            {/* Informações do Curso */}
-            <div className="space-y-2">
-              {[
-                { icon: Clock, text: course.duration },
-                { icon: BookOpen, text: `${course.totalLessons} aulas` },
-                { text: `Último acesso: ${course.lastAccessed}`, className: "text-xs" }
-              ].map((info, index) => (
-                <div key={index} className="flex items-center gap-2 text-sm text-gray-400">
-                  {info.icon && <info.icon className="h-4 w-4" />}
-                  <span className={info.className || ""}>{info.text}</span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </div>
-
-        {/* Botão de Continuar */}
-        <div className="p-4 mt-auto">
-          <Button 
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white group-hover:bg-blue-600 transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleCourseClick(course.id);
-            }}
+        {purchasedCourses.map((course) => (
+          <Card
+            key={course.id}
+            className="flex flex-col bg-white/5 backdrop-blur-md border border-gray-500/20 hover:border-blue-500/40 transition-all duration-300 hover:scale-105 cursor-pointer group"
+            onClick={() => handleCourseClick(course.id)}
           >
-            <Play className="h-4 w-4 mr-2" />
-            {course.progress === 0 ? 'Começar Curso' : 'Continuar'}
-          </Button>
-        </div>
+            {/* Imagem de Capa */}
+            <div className="relative overflow-hidden rounded-t-lg">
+              <img
+                src={course.coverImage}
+                alt={course.title}
+                className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+
+              {/* Badge de Nível */}
+              <div className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-medium ${getLevelColor(course.level)}`}>
+                {course.level}
+              </div>
+
+              {/* Badge de Certificado */}
+              {course.certificate && (
+                <div className="absolute top-3 left-3 p-1 bg-yellow-500/90 rounded-full">
+                  <Award className="h-4 w-4 text-white" />
+                </div>
+              )}
+            </div>
+
+            {/* Conteúdo do Card */}
+            <div className="flex flex-col flex-1 justify-between">
+              <div>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-white text-lg group-hover:text-blue-400 transition-colors">
+                    {course.title}
+                  </CardTitle>
+                  <CardDescription className="text-gray-400 text-sm line-clamp-2">
+                    {course.description}
+                  </CardDescription>
+                </CardHeader>
+
+                <CardContent className="space-y-4">
+                  {/* Progresso */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Progresso</span>
+                      <span className="text-white font-medium">{course.progress}%</span>
+                    </div>
+                    <Progress
+                      value={course.progress}
+                      className="h-2"
+                      style={{
+                        '--progress-background': getProgressColor(course.progress)
+                      } as React.CSSProperties}
+                    />
+                    <p className="text-gray-400 text-xs">
+                      {course.completedLessons} de {course.totalLessons} aulas concluídas
+                    </p>
+                  </div>
+
+                  {/* Informações do Curso */}
+                  <div className="space-y-2">
+                    {[
+                      { icon: Clock, text: course.duration },
+                      { icon: BookOpen, text: `${course.totalLessons} aulas` },
+                      { text: `Último acesso: ${course.lastAccessed}`, className: "text-xs" }
+                    ].map((info, index) => (
+                      <div key={index} className="flex items-center gap-2 text-sm text-gray-400">
+                        {info.icon && <info.icon className="h-4 w-4" />}
+                        <span className={info.className || ""}>{info.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </div>
+
+              {/* Botão de Continuar */}
+              <div className="p-4 mt-auto">
+                <Button
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white group-hover:bg-blue-600 transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCourseClick(course.id);
+                  }}
+                >
+                  <Play className="h-4 w-4 mr-2" />
+                  {course.progress === 0 ? 'Começar Curso' : 'Continuar'}
+                </Button>
+              </div>
+            </div>
+          </Card>
+        ))}
       </div>
-    </Card>
-  ))}
-</div>
 
 
- {/* 
+      {/* 
 <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 backdrop-blur-md border border-green-500/20 rounded-lg p-6">
   <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
     <Award className="h-6 w-6 text-green-400" />

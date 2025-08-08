@@ -464,141 +464,147 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
 
             {/* Seleção de Cursos */}
             <Card>
-              <CardHeader>
-                <CardTitle>Selecione os Cursos</CardTitle>
-                <CardDescription>
-                  Escolha um ou mais cursos que deseja realizar
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {coursesLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <Loader2 className="h-6 w-6 animate-spin text-orange-500" />
-                    <span className="ml-2 text-gray-600">Carregando cursos...</span>
-                  </div>
-                ) : coursesError ? (
-                  <div className="text-center py-8">
-                    <p className="text-red-500">Erro ao carregar cursos. Tente novamente.</p>
-                    <Button
-                      variant="outline"
-                      onClick={() => window.location.reload()}
-                      className="mt-2"
-                    >
-                      Recarregar
-                    </Button>
-                  </div>
-                ) : activeCourses.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-gray-500">Nenhum curso disponível no momento.</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {activeCourses.map((course, idx) => (
-                      <div
-                        key={course.id}
-                        className={`flex flex-col md:flex-row items-center md:items-center p-4 border rounded-lg transition-all duration-200 min-h-[220px] md:min-h-[180px] h-full ${formData.courses.some(obj => obj.id === String(course.id))
-                          ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-400/10'
-                          }`}
-                        onClick={() =>
-                          handleCourseChange(course.id, !formData.courses.some(obj => String(obj.id) === String(course.id)))
-                        }
-                        style={{ minHeight: 220, height: "100%", cursor: "pointer" }}
-                      >
-                        {/* Imagem */}
-                        <div className="flex-shrink-0 flex justify-center items-center w-full md:w-auto mb-4 md:mb-0 md:mr-6">
-                          <img
-                            src={
-                              idx % 3 === 0
-                                ? "https://www.soldaeletrica.com.br/imagens/mpi/servicos-de-soldas-especiais-02.jpg"
-                                : idx % 3 === 1
-                                  ? "https://blog.chicosoldas.com.br/wp-content/uploads/2023/03/soldagem.jpg"
-                                  : "https://tse1.mm.bing.net/th/id/OIP.0FHL4o5gHHvLctxgfGTF6wHaE5?w=859&h=569&rs=1&pid=ImgDetMain&o=7&rm=3"
-                            }
-                            alt="Capa do curso"
-                            className="w-32 h-32 object-cover rounded-md border shadow-md"
+  <CardHeader>
+    <CardTitle>Selecione os Cursos</CardTitle>
+    <CardDescription>
+      Escolha um ou mais cursos que deseja realizar
+    </CardDescription>
+  </CardHeader>
+  <CardContent>
+    {coursesLoading ? (
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="h-6 w-6 animate-spin text-orange-500" />
+        <span className="ml-2 text-gray-600">Carregando cursos...</span>
+      </div>
+    ) : coursesError ? (
+      <div className="text-center py-8">
+        <p className="text-red-500">Erro ao carregar cursos. Tente novamente.</p>
+        <Button
+          variant="outline"
+          onClick={() => window.location.reload()}
+          className="mt-2"
+        >
+          Recarregar
+        </Button>
+      </div>
+    ) : activeCourses.length === 0 ? (
+      <div className="text-center py-8">
+        <p className="text-gray-500">Nenhum curso disponível no momento.</p>
+      </div>
+    ) : (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {activeCourses.map((course, idx) => (
+          <div
+          key={course.id}
+          className={`flex flex-col md:flex-row items-center md:items-center p-4 border rounded-lg transition-all duration-200 min-h-[220px] md:min-h-[180px] h-full ${
+            formData.courses.some(obj => obj.id === String(course.id))
+              ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
+              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-400/10'
+          }`}
+          style={{ minHeight: 220, height: "100%", cursor: "pointer" }}
+          onClick={() => {
+            if (course.name === "Curso Fundamentos da Soldagem - MPS") {
+              window.open('https://wa.me/5512992545942', '_blank');
+            } else {
+              handleCourseChange(course.id, !formData.courses.some(obj => String(obj.id) === String(course.id)));
+            }
+          }}
+        >
+            {/* Imagem */}
+            <div className="flex-shrink-0 flex justify-center items-center w-full md:w-auto mb-4 md:mb-0 md:mr-6">
+              <img
+                src={
+                  idx % 3 === 0
+                    ? "https://www.soldaeletrica.com.br/imagens/mpi/servicos-de-soldas-especiais-02.jpg"
+                    : idx % 3 === 1
+                      ? "https://blog.chicosoldas.com.br/wp-content/uploads/2023/03/soldagem.jpg"
+                      : "https://tse1.mm.bing.net/th/id/OIP.0FHL4o5gHHvLctxgfGTF6wHaE5?w=859&h=569&rs=1&pid=ImgDetMain&o=7&rm=3"
+                }
+                alt="Capa do curso"
+                className="w-32 h-32 object-cover rounded-md border shadow-md"
+              />
+            </div>
+            {/* Conteúdo */}
+            <div className="flex-1 flex flex-row items-center w-full">
+              <div className="flex-1 flex flex-col justify-center h-full">
+                <Label htmlFor={course.id} className="font-semibold cursor-pointer">
+                  {course.name}
+                </Label>
+                <p className="text-sm text-gray-600 mt-1">{course.description}</p>
+                <div className="flex justify-between items-center mt-2 flex-wrap gap-2">
+                  <span className="text-sm text-gray-500">{course.time}</span>
+                  <span className="font-bold text-orange-600">
+                    R$ {(formData.billingType === 'PIX'
+                      ? course.pricePix
+                      : formData.billingType === 'BOLETO'
+                        ? course.priceBoleto
+                        : course.priceCartao
+                    )?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+
+                {/* Two side-by-side radio options at the bottom of the card */}
+                {course?.additionalCourse && formData.courses.some(obj => obj.id === String(course.id)) && (
+                  <div className="flex flex-col md:flex-row gap-2 pt-5 text-gray-600">
+                    {courses
+                      .filter(optionCourse => optionCourse.isActive === false)
+                      .map(optionCourse => (
+                        <label
+                          key={optionCourse.id}
+                          className={`flex items-center gap-1 text-xs px-2 py-1 rounded 
+                            ${optionCourse.isActive ? 'bg-gray-200 text-gray-500 line-through cursor-not-allowed' : 'cursor-pointer'}
+                          `}
+                          onClick={e => {
+                            if (!optionCourse.isActive) e.preventDefault();
+                            e.stopPropagation();
+                          }}
+                        >
+                          <input
+                            className='cursor-pointer'
+                            type="radio"
+                            name={`courseOption-${course.id}`}
+                            value={optionCourse.time}
+                            checked={formData.courses.find(obj => obj.id === String(course.id))?.time === optionCourse.time} onClick={e => e.stopPropagation()}
+                            onChange={e => {
+                              const value = e.target.value
+                              setFormData(prev => ({
+                                ...prev,
+                                courses: prev.courses.map(obj =>
+                                  String(obj.id) === String(course.id)
+                                    ? { ...obj, time: String(value) }
+                                    : obj)
+                              }));
+                            }}
                           />
-                        </div>
-                        {/* Conteúdo */}
-                        <div className="flex-1 flex flex-row items-center w-full">
-                          <div className="flex-1 flex flex-col justify-center h-full">
-                            <Label htmlFor={course.id} className="font-semibold cursor-pointer">
-                              {course.name}
-                            </Label>
-                            <p className="text-sm text-gray-600 mt-1">{course.description}</p>
-                            <div className="flex justify-between items-center mt-2 flex-wrap gap-2">
-                              <span className="text-sm text-gray-500">{course.time}</span>
-                              <span className="font-bold text-orange-600">
-                                R$ {(formData.billingType === 'PIX'
-                                  ? course.pricePix
-                                  : formData.billingType === 'BOLETO'
-                                    ? course.priceBoleto
-                                    : course.priceCartao
-                                )?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                              </span>
-                            </div>
-
-                            {/* Two side-by-side radio options at the bottom of the card */}
-                            {course?.additionalCourse && formData.courses.some(obj => obj.id === String(course.id)) && (
-                              <div className="flex flex-col md:flex-row gap-2 pt-5 text-gray-600">
-                                {courses
-                                  .filter(optionCourse => optionCourse.isActive === false)
-                                  .map(optionCourse => (
-                                    <label
-                                      key={optionCourse.id}
-                                      className={`flex items-center gap-1 text-xs px-2 py-1 rounded 
-                                        ${optionCourse.isActive ? 'bg-gray-200 text-gray-500 line-through cursor-not-allowed' : 'cursor-pointer'}
-                                      `}
-                                      onClick={e => {
-                                        if (!optionCourse.isActive) e.preventDefault();
-                                        e.stopPropagation();
-                                      }}
-                                    >
-                                      <input
-                                        className='cursor-pointer'
-                                        type="radio"
-                                        name={`courseOption-${course.id}`}
-                                        value={optionCourse.time}
-                                        checked={formData.courses.find(obj => obj.id === String(course.id))?.time === optionCourse.time} onClick={e => e.stopPropagation()}
-                                        onChange={e => {
-                                          const value = e.target.value
-                                          setFormData(prev => ({
-                                            ...prev,
-                                            courses: prev.courses.map(obj =>
-                                              String(obj.id) === String(course.id)
-                                                ? { ...obj, time: String(value) }
-                                                : obj)
-                                          }));
-                                        }}
-                                      />
-                                      {optionCourse.name} {optionCourse.time}
-                                    </label>
-                                  ))}
-                              </div>
-                            )}
-
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                          {optionCourse.name} {optionCourse.time}
+                        </label>
+                      ))}
                   </div>
                 )}
 
-                {formData.courses.length > 0 && (
-                  <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div className="flex justify-between items-center">
-                      <span className="font-semibold">Total dos Cursos Selecionados:</span>
-                      <span className="text-2xl font-bold text-orange-600">
-                        R$ {getTotalPrice().toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600 mt-2">
-                      {formData.courses.length} curso(s) selecionado(s)
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+
+    {formData.courses.length > 0 && (
+      <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <div className="flex justify-between items-center">
+          <span className="font-semibold">Total dos Cursos Selecionados:</span>
+          <span className="text-2xl font-bold text-orange-600">
+            R$ {getTotalPrice().toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </span>
+        </div>
+        <p className="text-sm text-gray-600 mt-2">
+          {formData.courses.length} curso(s) selecionado(s)
+        </p>
+      </div>
+    )}
+  </CardContent>
+</Card>
+
 
             {/* Forma de Pagamento */}
             <Card>
@@ -610,6 +616,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
               </CardHeader>
               <CardContent>
                 <RadioGroup
+                  className="flex flex-col gap-5 sm:gap-4"
                   value={formData.billingType}
                   onValueChange={(value: 'PIX' | 'BOLETO' | 'CARTAO') => {
                     setFormData(prev => {
@@ -618,12 +625,11 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                       if (value === 'BOLETO') {
                         const date = new Date();
                         date.setDate(date.getDate() + 7);
-                        // Format as dd/mm/yyyy
-                        dueDate = date.toLocaleDateString('pt-BR', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric'
-                        });
+                        // Format as MM-DD-YYYY
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const year = date.getFullYear();
+                        dueDate = `${year}-${month}-${day}`;
                       }
                       return {
                         ...prev,
@@ -634,7 +640,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                     setPaymentMethod(value);
                   }}
                   required>
-                  <div className="flex items-center space-x-2 mb-5">
+                  <div className="flex items-center space-x-2 mb-5 h-6">
                     <RadioGroupItem value="PIX" id="PIX" />
                     <Label htmlFor="PIX" className="flex items-center gap-2 cursor-pointer">
                       <QrCode className="h-4 w-4" />
@@ -644,7 +650,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                       }, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center h-6">
                     <div className="flex items-center space-x-2 mb-5">
                       <RadioGroupItem value="BOLETO" id="BOLETO" />
                       <Label htmlFor="BOLETO" className="flex items-center gap-2 cursor-pointer">
@@ -656,10 +662,9 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ isOpen, onClose 
                       </Label>
                     </div>
                     {formData.billingType === 'BOLETO' && (
-                      <div className="mb-3 flex items-center mb-5 gap-2">
-                        <Label htmlFor="installments">Parcelamento:</Label>
+                      <div className="mb-5 flex flex-col sm:flex-row items-start sm:items-center gap-2 ml-2">
+                        <Label>Parcelamento:</Label>
                         <Select
-                          id="installments"
                           value={String(formData.installments)}
                           onValueChange={val =>
                             setFormData(prev => ({

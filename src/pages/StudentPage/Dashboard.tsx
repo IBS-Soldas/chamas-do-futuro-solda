@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -15,7 +14,6 @@ const Dashboard = () => {
   const { auth } = useFirebase();
   const user = auth.currentUser;
   
- 
   const getUserName = () => {
     if (user?.displayName) {
       return user.displayName;
@@ -121,7 +119,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <Button
-              onClick={() => navigate('/dashboard/aulas')}
+              onClick={() => navigate('/dashboard-student/cursos')}
               className="w-full bg-blue-500 hover:bg-blue-600"
             >
               Ir para Aulas
@@ -145,7 +143,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <Button
-              onClick={() => navigate('/dashboard/apostilas')}
+              onClick={() => navigate('/dashboard-student/apostilas')}
               className="w-full bg-green-500 hover:bg-green-600"
             >
               Ver Apostilas
@@ -169,7 +167,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <Button
-              onClick={() => navigate('/dashboard/certificados')}
+              onClick={() => navigate('/dashboard-student/certificados')}
               className="w-full bg-yellow-500 hover:bg-yellow-600 text-black"
             >
               Ver Certificados
