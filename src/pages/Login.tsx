@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useFirebase } from '@/contexts/FirebaseContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast'; // If you have a toast hook
+import { useApp } from '@/contexts/AppContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -20,6 +21,7 @@ const Login = () => {
   const { user, loading } = useFirebase();
   const { signIn, error } = useAuth();
   const { toast } = useToast(); // If you use a toast system
+  const { setUser } = useApp()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +39,7 @@ const Login = () => {
         duration: 2000,
       });
       console.log(user)
+      setUser(user)
       if (user.accessLevel === 1) {
         navigate('/dashboard-student');
       } else if (user.accessLevel === 3) {
@@ -51,11 +54,11 @@ const Login = () => {
       if (toast) {
         toast({
           title: 'Erro ao fazer login',
-          description:  'Não foi possível conectar. Verifique suas credenciais e conexão.',
+          description: 'Não foi possível conectar. Verifique suas credenciais e conexão.',
           variant: 'destructive',
         });
       } else {
-        setFormError( 'Não foi possível conectar. Verifique suas credenciais e conexão.');
+        setFormError('Não foi possível conectar. Verifique suas credenciais e conexão.');
       }
     }
   };
@@ -67,14 +70,14 @@ const Login = () => {
       <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-orange-500/20 shadow-2xl">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
-              {/* <Flame className="h-8 w-8 text-white" /> */}
-              <div className="p-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-full welding-glow">
-                <img
-                  src="/logo.png"
-                  alt="Logo"
-                  className="h-12 w-12 object-contain"
-                />
-              </div>
+            {/* <Flame className="h-8 w-8 text-white" /> */}
+            <div className="p-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-full welding-glow">
+              <img
+                src="/logo.png"
+                alt="Logo"
+                className="h-12 w-12 object-contain"
+              />
+            </div>
           </div>
           <CardTitle className="text-2xl font-bold text-white">
             Área do Aluno

@@ -1,12 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Play, CheckCircle, Clock, BookOpen, Award } from "lucide-react";
+import { useApp } from '@/contexts/AppContext';
 
 const Courses = () => {
+  const { user } = useApp();
   const navigate = useNavigate();
+
+  useEffect(() => (
+    console.log(user)
+  ))
 
   // Dados base dos cursos
   const courseData = [

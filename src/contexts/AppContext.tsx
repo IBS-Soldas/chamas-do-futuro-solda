@@ -29,6 +29,8 @@ interface AppContextType {
     setTheme: (theme: 'light' | 'dark') => void;
     users: UserData[];
     setUsers: (users: UserData[]) => void;
+    user: UserData | null;
+    setUser: (user: UserData) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -37,9 +39,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const [isAdmin, setIsAdmin] = useState(false);
     const [theme, setTheme] = useState<'light' | 'dark'>('light');
     const [users, setUsers] = useState<UserData[]>([]);
+    const [user, setUser] = useState<UserData | null>(null);
+
+    // React.useEffect(() => {
+    //     if (users.length > 0 && !user) {
+    //         // Replace the condition below with your logic to select a user
+    //         const foundUser = users.find(u => u.email === 'some@email.com');
+    //         if (foundUser) {
+    //             setUser(foundUser);
+    //         }
+    //     }
+    // }, [users, user]);
 
     return (
-        <AppContext.Provider value={{ isAdmin, setIsAdmin, theme, setTheme, users, setUsers }}>
+        <AppContext.Provider value={{ isAdmin, setIsAdmin, theme, setTheme, users, setUsers, user, setUser }}>
             {children}
         </AppContext.Provider>
     );
